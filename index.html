@@ -321,15 +321,15 @@ tr:hover td { background:var(--surface2); }
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">Harithra shop</div>
-    <div class="auth-sub">Retail Management System</div>
-    <label class="auth-label">Username</label>
+    <div class="auth-sub" data-t="rms">Retail Management System</div>
+    <label class="auth-label" data-t="username">Username</label>
     <input class="auth-input" id="login-user" type="text" placeholder="Enter username" autocomplete="off">
-    <label class="auth-label">Password</label>
+    <label class="auth-label" data-t="password">Password</label>
     <input class="auth-input" id="login-pass" type="password" placeholder="Enter password">
-    <button class="auth-btn" onclick="doLogin()">Sign In</button>
+    <button class="auth-btn" onclick="doLogin()" data-t="signin">Sign In</button>
     <div class="auth-err" id="auth-err">Invalid credentials. Please try again.</div>
     <div class="auth-roles">
-      <div class="auth-roles-title">Quick Login</div>
+      <div class="auth-roles-title" data-t="quick_login">Quick Login</div>
       <div class="role-hints">
         <div class="role-hint" onclick="fillLogin('admin','admin123')">Admin — admin / admin123</div>
         <div class="role-hint" onclick="fillLogin('cashier','cash123')">Cashier — cashier / cash123</div>
@@ -478,44 +478,50 @@ tr:hover td { background:var(--surface2); }
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-text">Harithra shop</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="sidebar-logo-text">Harithra shop</div>
+        <div style="display:flex; gap:4px;">
+          <button onclick="setLanguage('en')" style="font-size:10px; padding:2px 4px; cursor:pointer; background:var(--surface2); border:1px solid var(--border); color:var(--text2); border-radius:4px;">EN</button>
+          <button onclick="setLanguage('ta')" style="font-size:10px; padding:2px 4px; cursor:pointer; background:var(--surface2); border:1px solid var(--border); color:var(--text2); border-radius:4px;">தமிழ்</button>
+        </div>
+      </div>
       <div class="sidebar-role" id="sidebar-role-label">Retail Management</div>
     </div>
     <nav class="nav">
-      <div class="nav-section">Main</div>
+      <div class="nav-section" data-t="main">Main</div>
       <div class="nav-item active" onclick="navigate('dashboard')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-        Dashboard
+        <span data-t="dashboard">Dashboard</span>
       </div>
       <div class="nav-item" onclick="navigate('pos')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M4 4V3a2 2 0 014 0v1"/><circle cx="8" cy="9" r="1.5"/></svg>
-        Point of Sale
+        <span data-t="pos">Point of Sale</span>
       </div>
       <div class="nav-item" onclick="navigate('pending')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 12.6A5.6 5.6 0 118 2.4a5.6 5.6 0 010 11.2z"/><path d="M8.4 4H7.6v4.4l3.1 1.8.4-.7-2.7-1.5z"/></svg>
-        Pending Payments
+        <span data-t="pending">Pending Payments</span>
       </div>
-      <div class="nav-section">Inventory</div>
+      <div class="nav-section" data-t="inventory">Inventory</div>
       <div class="nav-item" onclick="navigate('inventory')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="7" width="14" height="8" rx="1"/><rect x="3" y="4" width="10" height="4" rx="1"/><rect x="5" y="1" width="6" height="4" rx="1"/></svg>
-        Products
+        <span data-t="products">Products</span>
       </div>
       <div class="nav-item" onclick="navigate('stockbuys')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM2 5l1 9h10l1-9"/><path d="M6 8v4M10 8v4"/></svg>
-        Stock Purchases
+        <span data-t="stockbuys">Stock Purchases</span>
       </div>
-      <div class="nav-section">Sales</div>
+      <div class="nav-section" data-t="sales_sec">Sales</div>
       <div class="nav-item" onclick="navigate('sales')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12L4 4h8l3 8H1z"/><circle cx="5.5" cy="14" r="1"/><circle cx="10.5" cy="14" r="1"/></svg>
-        Sales History
+        <span data-t="sales">Sales History</span>
       </div>
       <div class="nav-item" onclick="navigate('reports')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="1.5"/><path d="M4 10V7M7 10V5M10 10V8M13 10V6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-        Reports
+        <span data-t="reports">Reports</span>
       </div>
       <div class="nav-item admin-only" onclick="navigate('admin')">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M1 14c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="13" cy="2" r="1.5"/><path d="M13 3.5v2M11.7 4.2l1.4 1.4"/></svg>
-        Admin Panel
+        <span data-t="admin">Admin Panel</span>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -534,42 +540,41 @@ tr:hover td { background:var(--surface2); }
   <div class="main">
 
     <!-- DASHBOARD -->
-    <div id="page-dashboard" class="page active">
       <div class="page-header">
-        <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date"></div></div>
-        <button class="btn btn-primary" onclick="navigate('pos')">+ New Sale</button>
+        <div><div class="page-title" data-t="dashboard">Dashboard</div><div class="page-sub" id="dash-date"></div></div>
+        <button class="btn btn-primary" onclick="navigate('pos')" data-t="new_sale">+ New Sale</button>
       </div>
       <div id="low-stock-alert" style="display:none;" class="alert-bar">
         ⚠ Low stock alert: <span id="low-stock-count"></span> products need restocking.
         <button class="btn btn-sm btn-danger" style="margin-left:auto;" onclick="navigate('inventory')">View</button>
       </div>
       <div class="grid-4" style="margin-bottom:1.5rem;">
-        <div class="stat-card"><div class="stat-label">Today's Sales</div><div class="stat-value" id="stat-today">₹0</div><div class="stat-change stat-up" id="stat-today-ch"></div></div>
-        <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">₹0</div><div class="stat-change" id="stat-rev-ch"></div></div>
-        <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value" id="stat-products">0</div><div class="stat-change" id="stat-prod-ch"></div></div>
-        <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-value" id="stat-txns">0</div></div>
+        <div class="stat-card"><div class="stat-label" data-t="today_sales">Today's Sales</div><div class="stat-value" id="stat-today">₹0</div><div class="stat-change stat-up" id="stat-today-ch"></div></div>
+        <div class="stat-card"><div class="stat-label" data-t="revenue">Total Revenue</div><div class="stat-value" id="stat-revenue">₹0</div><div class="stat-change" id="stat-rev-ch"></div></div>
+        <div class="stat-card"><div class="stat-label" data-t="products">Products</div><div class="stat-value" id="stat-products">0</div><div class="stat-change" id="stat-prod-ch"></div></div>
+        <div class="stat-card"><div class="stat-label" data-t="txns">Transactions</div><div class="stat-value" id="stat-txns">0</div></div>
       </div>
       <div class="grid-2" style="margin-bottom:1.5rem;">
         <div class="card">
-          <div style="font-weight:500;margin-bottom:1.25rem;">Weekly Sales</div>
+          <div style="font-weight:500;margin-bottom:1.25rem;" data-t="weekly">Weekly Sales</div>
           <div class="chart-bar-wrap" id="week-chart"></div>
           <div class="chart-labels" id="week-labels"></div>
         </div>
         <div class="card">
-          <div style="font-weight:500;margin-bottom:1.25rem;">Recent Activity</div>
+          <div style="font-weight:500;margin-bottom:1.25rem;" data-t="activity">Recent Activity</div>
           <div class="activity-list" id="activity-list"></div>
         </div>
       </div>
       <div class="grid-2">
         <div class="card">
-          <div style="font-weight:500;margin-bottom:1rem;">Top Selling Products</div>
+          <div style="font-weight:500;margin-bottom:1rem;" data-t="top_prod">Top Selling Products</div>
           <div class="table-wrap">
             <table><thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead>
             <tbody id="top-products-table"></tbody></table>
           </div>
         </div>
         <div class="card">
-          <div style="font-weight:500;margin-bottom:1rem;">Low Stock Items</div>
+          <div style="font-weight:500;margin-bottom:1rem;" data-t="low_stock">Low Stock Items</div>
           <div class="table-wrap">
             <table><thead><tr><th>Product</th><th>Stock</th><th>Status</th></tr></thead>
             <tbody id="low-stock-table"></tbody></table>
@@ -859,7 +864,46 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const docRef = db.collection("system").doc("data");
 
-// ═══════════════════════════════ STATE ═══════════════════════════════
+const I18N = {
+  en: {
+    main: "Main", inventory: "Inventory", sales_sec: "Sales",
+    dashboard: "Dashboard", pos: "Point of Sale", pending: "Pending Payments",
+    products: "Products", stockbuys: "Stock Purchases",
+    sales: "Sales History", reports: "Reports", admin: "Admin Panel",
+    logout: "Sign Out", new_sale: "+ New Sale",
+    today_sales: "Today's Sales", revenue: "Total Revenue", txns: "Transactions",
+    weekly: "Weekly Sales", activity: "Recent Activity", top_prod: "Top Selling Products", low_stock: "Low Stock Items",
+    rms: "Retail Management System", username: "Username", password: "Password", signin: "Sign In", quick_login: "Quick Login"
+  },
+  ta: {
+    main: "முக்கியமானவை", inventory: "சரக்கு இருப்பு", sales_sec: "விற்பனை",
+    dashboard: "முகப்பு", pos: "விற்பனை முனை", pending: "நிலுவை தொகை",
+    products: "தயாரிப்புகள்", stockbuys: "சரக்கு கொள்முதல்",
+    sales: "விற்பனை வரலாறு", reports: "அறிக்கைகள்", admin: "நிர்வாகம்",
+    logout: "வெளியேறு", new_sale: "+ புதிய விற்பனை",
+    today_sales: "இன்றைய விற்பனை", revenue: "மொத்த வருவாய்", txns: "பரிவர்த்தனைகள்",
+    weekly: "வாராந்திர விற்பனை", activity: "சமீபத்திய நடவடிக்கை", top_prod: "அதிகம் விற்பனையாகும் பொருட்கள்", low_stock: "குறைந்த இருப்பு பொருட்கள்",
+    rms: "சில்லறை மேலாண்மை அமைப்பு", username: "பயனர் பெயர்", password: "கடவுச்சொல்", signin: "உள்நுழைய", quick_login: "விரைவான உள்நுழைவு"
+  }
+};
+
+function t(key) {
+  return I18N[state.lang || 'en'][key] || key;
+}
+
+function translateStaticUI() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.dataset.t;
+    el.innerText = t(key);
+  });
+}
+
+function setLanguage(lang) {
+  state.lang = lang;
+  saveToStorage();
+  location.reload(); 
+}
+
 const USERS = [
   { username:'admin', password:'admin123', role:'admin', name:'Admin' },
   { username:'cashier', password:'cash123', role:'cashier', name:'Cashier' }
@@ -867,6 +911,7 @@ const USERS = [
 
 let state = {
   user: null,
+  lang: 'en',
   filters: {
     categories: ['Saree','Nighty','Linen','Dress Material','Accessories','Innerwear','Home Textiles'],
     brands: ['PAMOL','Arrow','Park Avenue','Allen Solly','UCB','Levi\'s','Van Heusen'],
@@ -1025,9 +1070,46 @@ async function initApp(){
     await saveToStorage();
   }
   
+  translateStaticUI();
   populateFilterSelects();
   renderDashboard();
   showToast('Data Synced', 'success');
+}
+
+async function saveToStorage(){
+  localStorage.setItem('radimade_data', JSON.stringify(state));
+  try {
+    const { user, cart, editingProduct, ...cloudData } = state;
+    await docRef.set(cloudData);
+  } catch (e) {
+    console.error("Cloud sync failed:", e);
+  }
+}
+
+function loadFromStorage(){
+  const d = localStorage.getItem('radimade_data');
+  return d ? JSON.parse(d) : {};
+}
+
+async function loadFromCloud(){
+  try {
+    const doc = await docRef.get();
+    if(doc.exists) {
+      const data = doc.data();
+      state.filters = data.filters || state.filters;
+      state.products = data.products || [];
+      state.sales = data.sales || [];
+      state.buys = data.buys || [];
+      state.settings = data.settings || state.settings;
+      state.extraUsers = data.extraUsers || [];
+      state.credits = data.credits || [];
+      state.lang = data.lang || state.lang;
+      return true;
+    }
+  } catch (e) {
+    console.error("Cloud load failed:", e);
+  }
+  return false;
 }
 
 function fmt(n){ return (state.settings.currency||'₹')+Number(n||0).toLocaleString('en-IN'); }
