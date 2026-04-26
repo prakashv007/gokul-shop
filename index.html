@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radimade Retail — Management System</title>
+<title>Harithra shop — Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -320,7 +320,7 @@ tr:hover td { background:var(--surface2); }
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
-    <div class="auth-logo">Radimade</div>
+    <div class="auth-logo">Harithra shop</div>
     <div class="auth-sub">Retail Management System</div>
     <label class="auth-label">Username</label>
     <input class="auth-input" id="login-user" type="text" placeholder="Enter username" autocomplete="off">
@@ -345,7 +345,7 @@ tr:hover td { background:var(--surface2); }
 <div class="modal-overlay" id="receipt-modal-overlay">
   <div class="modal receipt-modal">
     <div class="receipt-header">
-      <div class="receipt-logo">Radimade</div>
+      <div class="receipt-logo">Harithra shop</div>
       <div style="font-size:0.75rem;color:var(--text3);margin-top:4px;" id="receipt-date"></div>
     </div>
     <hr class="receipt-divider">
@@ -470,7 +470,7 @@ tr:hover td { background:var(--surface2); }
 <div id="app">
   <div class="mobile-overlay" onclick="toggleMobileMenu()"></div>
   <div class="mobile-header">
-    <div class="mobile-logo">Radimade</div>
+    <div class="mobile-logo">Harithra shop</div>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
@@ -478,7 +478,7 @@ tr:hover td { background:var(--surface2); }
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-text">Radimade</div>
+      <div class="sidebar-logo-text">Harithra shop</div>
       <div class="sidebar-role" id="sidebar-role-label">Retail Management</div>
     </div>
     <nav class="nav">
@@ -881,7 +881,7 @@ let state = {
   cart: [],
   payMethod: 'Cash',
   editingProduct: null,
-  settings: { name:'Radimade', tax:0, currency:'₹', lowStock:5, footer:'Thank you for shopping at Radimade!' },
+  settings: { name:'Harithra shop', tax:0, currency:'₹', lowStock:5, footer:'Thank you for shopping at Harithra shop!' },
   extraUsers: [],
   credits: [],
   ...loadFromStorage()
