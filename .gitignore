@@ -1,0 +1,7 @@
+# Ignore media and bills
+bills/
+.gemini/
+*.jpeg
+*.png
+*.pdf
+node_modules/
