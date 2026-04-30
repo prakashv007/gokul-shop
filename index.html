@@ -688,27 +688,46 @@ let cart=[];
 let currentUser=null; // This will store the local user object after login
 let pndFilter='pending';
 
-const save=async()=>{
-  localStorage.setItem('rp_v2',JSON.stringify(S));
-  if(db){
-    try {
-      await db.collection('appData').doc('main').set(S);
-    } catch(e) {
-      console.error("Cloud sync failed", e);
+let isSaving = false;
+
+const startCloudSync = () => {
+  if(!db) return;
+  // Use onSnapshot for real-time updates across devices
+  db.collection('appData').doc('main').onSnapshot(doc => {
+    if(doc.exists){
+      const data = doc.data();
+      // Only update local state if we aren't currently in the middle of saving
+      // and if the data is actually different (avoids redundant refreshes)
+      if(!isSaving && JSON.stringify(data) !== JSON.stringify(S)){
+        console.log("Cloud sync: Updating local state...");
+        S = data;
+        localStorage.setItem('rp_v2', JSON.stringify(S));
+        initApp();
+      }
+    } else {
+      // First time initialization if cloud is empty
+      save();
     }
-  }
+  }, err => {
+    console.error("Snapshot listener error:", err);
+  });
 };
 
-const loadCloud=async()=>{
-  if(!db) return;
-  try {
-    const doc = await db.collection('appData').doc('main').get();
-    if(doc.exists){
-      S = doc.data();
-      initApp();
+const save = async () => {
+  localStorage.setItem('rp_v2', JSON.stringify(S));
+  if(db){
+    isSaving = true;
+    try {
+      await db.collection('appData').doc('main').set(S);
+      console.log("Cloud sync: Saved successfully.");
+    } catch(e) {
+      console.error("Cloud sync failed", e);
+      toast('Sync failed','err');
+    } finally {
+      // Wait a bit before allowing snapshots to update state again 
+      // to ensure our own write doesn't trigger a flickering reload
+      setTimeout(() => { isSaving = false; }, 1000);
     }
-  } catch(e) {
-    console.error("Failed to load from cloud", e);
   }
 };
 const cur=()=>S.settings.currency||'₹';
@@ -744,7 +763,7 @@ function login(){
     sessionStorage.setItem('rp_user', JSON.stringify(user));
     document.getElementById('auth').style.display = 'none';
     document.getElementById('shell').style.display = 'flex';
-    loadCloud();
+    startCloudSync();
     initApp();
     toast('Logged in as ' + user.name);
   } else {
@@ -759,7 +778,7 @@ function checkSession(){
     currentUser = JSON.parse(saved);
     document.getElementById('auth').style.display = 'none';
     document.getElementById('shell').style.display = 'flex';
-    loadCloud();
+    startCloudSync();
     initApp();
   } else {
     document.getElementById('auth').style.display = 'flex';
@@ -1526,7 +1545,7 @@ function toast(msg,type='ok'){
   t.classList.add(type==='err'?'err':'ok');
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1500);
 }
 document.getElementById('toast').addEventListener('click',function(){
   this.classList.remove('show');
