@@ -13,31 +13,31 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <style>
 :root{
-  --bg:#f0f2f5;
-  --mesh:radial-gradient(at 0% 0%, hsla(210,100%,95%,1) 0, transparent 50%), 
-         radial-gradient(at 50% 0%, hsla(220,100%,92%,1) 0, transparent 50%), 
-         radial-gradient(at 100% 0%, hsla(200,100%,95%,1) 0, transparent 50%);
-  --s1:rgba(255,255,255,0.7);
-  --s2:rgba(255,255,255,0.4);
-  --s3:rgba(255,255,255,0.2);
-  --glass:blur(20px) saturate(180%);
-  --border:rgba(255,255,255,0.6);
-  --border2:rgba(0,0,0,0.05);
-  --text:#0f172a;
-  --text2:#475569;
+  --bg:#0f172a;
+  --mesh:radial-gradient(at 0% 0%, hsla(260,100%,15%,1) 0, transparent 50%), 
+         radial-gradient(at 50% 0%, hsla(280,100%,10%,1) 0, transparent 50%), 
+         radial-gradient(at 100% 0%, hsla(240,100%,15%,1) 0, transparent 50%);
+  --s1:rgba(30,41,59,0.7);
+  --s2:rgba(30,41,59,0.4);
+  --s3:rgba(255,255,255,0.05);
+  --glass:blur(24px) saturate(160%);
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.05);
+  --text:#f8fafc;
+  --text2:#cbd5e1;
   --text3:#94a3b8;
-  --accent:linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
-  --accent-s:#007BFF;
-  --accent-d:rgba(0,123,255,0.1);
-  --green:linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-  --red:linear-gradient(135deg, #dc3545 0%, #a71d2a 100%);
+  --accent:linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --accent-s:#a78bfa;
+  --accent-d:rgba(139,92,246,0.15);
+  --green:linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --red:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   --nav:72px;
   --hdr:64px;
-  --r:16px;
-  --r2:24px;
+  --r:18px;
+  --r2:28px;
   --f-h:'Plus Jakarta Sans', sans-serif;
   --f-b:'Outfit', sans-serif;
-  --shadow:0 8px 32px 0 rgba(31,38,135,0.07);
+  --shadow:0 12px 40px -10px rgba(0,0,0,0.5);
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:var(--f-b);-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);background-image:var(--mesh);background-attachment:fixed;color:var(--text);line-height:1.6;overflow-x:hidden;letter-spacing:-0.01em;}
@@ -144,7 +144,7 @@ nav{
 .pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;}
 .prod-card{background:var(--s1);backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:.3s cubic-bezier(0.16, 1, 0.3, 1);position:relative;overflow:hidden;box-shadow:var(--shadow);}
 .prod-card:active{transform:scale(.95);}
-.prod-card.in-cart{border-color:var(--accent-s);background:rgba(255,255,255,0.9);box-shadow:0 12px 32px rgba(0,123,255,0.12);}
+.prod-card.in-cart{border-color:var(--accent-s);background:rgba(30,41,59,0.9);box-shadow:0 12px 32px rgba(139,92,246,0.2);}
 .prod-card.in-cart .prod-name{color:var(--accent-s);}
 .prod-card.out{opacity:.5;pointer-events:none;filter:grayscale(1);}
 .prod-name{font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
@@ -155,7 +155,7 @@ nav{
 /* ── CART SHEET ── */
 #cart-sheet{
   position:fixed;bottom:0;left:0;right:0;
-  background:rgba(255,255,255,0.9);backdrop-filter:var(--glass);
+  background:rgba(15,23,42,0.95);backdrop-filter:var(--glass);
   border-top:1px solid var(--border);
   border-radius:var(--r2) var(--r2) 0 0;
   max-height:85vh;display:flex;flex-direction:column;
@@ -183,7 +183,7 @@ nav{
 /* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,0.3);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;z-index:2000;padding:0;}
 .overlay.open{display:flex;}
-.modal{background:rgba(255,255,255,0.95);backdrop-filter:var(--glass);border-top:1px solid var(--border);border-radius:var(--r2) var(--r2) 0 0;width:100%;max-height:90vh;display:flex;flex-direction:column;animation:slideUp .4s cubic-bezier(0.16, 1, 0.3, 1);}
+.modal{background:rgba(15,23,42,0.98);backdrop-filter:var(--glass);border-top:1px solid var(--border);border-radius:var(--r2) var(--r2) 0 0;width:100%;max-height:90vh;display:flex;flex-direction:column;animation:slideUp .4s cubic-bezier(0.16, 1, 0.3, 1);}
 .modal.center{border-radius:var(--r2);max-width:440px;width:calc(100% - 2.4rem);margin:auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.15);}
 @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 .modal-hdr{padding:1.5rem 1.5rem 1rem;display:flex;align-items:center;justify-content:space-between;}
@@ -213,7 +213,7 @@ nav{
 .prog-fill{height:100%;border-radius:10px;transition:width .5s cubic-bezier(0.16, 1, 0.3, 1);}
 
 /* ── TOAST ── */
-#toast{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%) translateY(-200%);background:rgba(255,255,255,0.9);backdrop-filter:var(--glass);border:1px solid var(--border);padding:.8rem 1.8rem;border-radius:50px;font-size:.85rem;font-weight:700;z-index:9999;transition:.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);box-shadow:0 15px 40px rgba(0,0,0,0.12);display:flex;align-items:center;gap:12px;opacity:0;}
+#toast{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%) translateY(-200%);background:rgba(30,41,59,0.9);backdrop-filter:var(--glass);border:1px solid var(--border);padding:.8rem 1.8rem;border-radius:50px;font-size:.85rem;font-weight:700;z-index:9999;transition:.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);box-shadow:0 15px 40px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;opacity:0;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 #toast.ok{border-left:4px solid #28a745;}
 #toast.err{border-left:4px solid #dc3545;}
@@ -515,11 +515,11 @@ nav{
       </div>
 
       <div class="stat-grid">
-        <div class="stat-card" style="border-left:4px solid #dc3545;">
+        <div class="stat-card" style="border-left:4px solid #ef4444;">
           <div class="stat-lbl">Total Due</div>
           <div class="stat-val text-red" id="pnd-total">₹0</div>
         </div>
-        <div class="stat-card" style="border-left:4px solid #007BFF;">
+        <div class="stat-card" style="border-left:4px solid #8b5cf6;">
           <div class="stat-lbl">Customers</div>
           <div class="stat-val" id="pnd-custs">0</div>
         </div>
@@ -977,7 +977,7 @@ function renderDash(){
   const recent = [...S.sales].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
   const recentEl = document.getElementById('dash-recent');
   if(recentEl) recentEl.innerHTML = recent.length ? recent.map(s => `
-    <div class="card card-sm" style="margin-bottom:.75rem; border-left:4px solid ${s.total===s.paid?'#28a745':'#007BFF'};">
+    <div class="card card-sm" style="margin-bottom:.75rem; border-left:4px solid ${s.total===s.paid?'#10b981':'#8b5cf6'};">
       <div class="flex-between">
         <div>
           <div class="li-main">${s.customer}</div>
