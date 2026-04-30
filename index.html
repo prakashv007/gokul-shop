@@ -727,14 +727,8 @@ const DEFAULTS = {
   settings:{name:"Radimade",currency:"₹",lowStock:5,footer:"Thank you for shopping!"}
 };
 
-let S = JSON.parse(localStorage.getItem('rp_v2')) || JSON.parse(JSON.stringify(DEFAULTS));
-// Ensure all keys exist (migration)
-if(!S.restocks) S.restocks=[];
-if(!S.paymentLogs) S.paymentLogs=[];
-if(!S.filters.subcategories) S.filters.subcategories=["Cotton","Silk","Casual","Formal"];
-if(!S.filters.brands) S.filters.brands=[];
-if(!S.settings.tax) S.settings.tax=0;
-if(!S.settings.footer) S.settings.footer="Thank you for shopping!";
+let S = JSON.parse(JSON.stringify(DEFAULTS)); // Initialize with defaults, updated only by cloud
+let isCloudLoaded = false; // Flag to check if we've received the first cloud snapshot
 
 // ══════════════════════════════════════════════════
 //  HARDCODED USERS
@@ -756,45 +750,39 @@ const startCloudSync = () => {
   db.collection('appData').doc('main').onSnapshot(doc => {
     if(doc.exists){
       const data = doc.data();
-      if(!isSaving && JSON.stringify(data) !== JSON.stringify(S)){
-        console.log("Cloud sync: Remote update received. Updating local...");
+      // Sole source of truth update
+      if(!isSaving){
+        console.log("Cloud update received. Refreshing UI...");
         S = data;
-        localStorage.setItem('rp_v2', JSON.stringify(S));
+        isCloudLoaded = true;
+        isCloudReady = true;
         initApp();
       }
-      isCloudReady = true; // Cloud exists, we are in sync
     } else {
-      // Cloud document is MISSING
-      const localRaw = localStorage.getItem('rp_v2');
-      if(localRaw && !isSaving) {
-        // We have local data but cloud is empty. This means a RESET happened elsewhere.
-        console.warn("Remote reset detected. Purging local data to maintain integrity.");
-        localStorage.removeItem('rp_v2');
-        alert("The database was cleared from another device. This device will now reset.");
-        location.reload();
-      } else {
-        // Brand new install, no local data, no cloud data.
-        isCloudReady = true;
-        save(); // Initialize cloud with defaults
-      }
+      console.warn("Cloud document not found. Initializing with defaults...");
+      isCloudReady = true;
+      isCloudLoaded = true;
+      save(); // Push defaults to new cloud doc
+      initApp();
     }
   }, err => {
-    console.error("Snapshot listener error:", err);
-    // On error, we still allow local usage but don't mark cloud as ready
+    console.error("Cloud Error:", err);
+    toast("Database connection error",'err');
   });
 };
 
 const save = async () => {
-  localStorage.setItem('rp_v2', JSON.stringify(S));
+  // We no longer use localStorage for Shop Data to ensure Total Cloud Integrity
   if(db && isCloudReady){
     isSaving = true;
     try {
       await db.collection('appData').doc('main').set(S);
-      console.log("Cloud sync: Data pushed to remote.");
+      console.log("Cloud: Data updated.");
     } catch(e) {
-      console.error("Cloud push failed", e);
+      console.error("Cloud: Update failed", e);
+      toast("Sync failed",'err');
     } finally {
-      setTimeout(() => { isSaving = false; }, 1000);
+      setTimeout(() => { isSaving = false; }, 800);
     }
   }
 };
@@ -1603,19 +1591,19 @@ function renderRestockHistory(){
 }
 
 async function factoryReset(){
-  if(!confirm('WIPE ALL DATA? This cannot be undone.'))return;
+  if(!confirm('WIPE ENTIRE DATABASE? All data on all devices will be deleted.'))return;
   const c=prompt("Type DELETE to confirm:");
   if(c==='DELETE'){
     if(db){
       try {
         await db.collection('appData').doc('main').delete();
-        console.log("Cloud data wiped.");
+        console.log("Cloud wiped.");
+        location.reload();
       } catch(e){
-        console.error("Cloud wipe failed", e);
+        console.error("Wipe failed", e);
+        toast('Wipe failed','err');
       }
     }
-    localStorage.removeItem('rp_v2');
-    location.reload();
   }
 }
 
