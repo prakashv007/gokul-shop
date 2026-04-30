@@ -64,7 +64,8 @@ header{
 .lang-btn.active{background:var(--s1);color:var(--text);}
 .hdr-user{width:34px;height:34px;border-radius:12px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:var(--accent-s);cursor:pointer;backdrop-filter:var(--glass);box-shadow:var(--shadow);}
 
-main{flex:1;overflow-y:auto;padding:calc(var(--hdr) + 1rem) 0 var(--nav);}
+#shell{display:flex;flex-direction:column;height:100vh;height:100svh;overflow:hidden;}
+main{flex:1;overflow-y:auto;padding:calc(var(--hdr) + 1.2rem) 0 calc(var(--nav) + 1.2rem);-webkit-overflow-scrolling:touch;}
 .page{display:none;padding:0 1.2rem;animation:fadeUp .3s cubic-bezier(0.16, 1, 0.3, 1);}
 .page.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
