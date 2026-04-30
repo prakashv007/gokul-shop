@@ -741,12 +741,9 @@ let isSaving = false;
 
 const startCloudSync = () => {
   if(!db) return;
-  // Use onSnapshot for real-time updates across devices
   db.collection('appData').doc('main').onSnapshot(doc => {
     if(doc.exists){
       const data = doc.data();
-      // Only update local state if we aren't currently in the middle of saving
-      // and if the data is actually different (avoids redundant refreshes)
       if(!isSaving && JSON.stringify(data) !== JSON.stringify(S)){
         console.log("Cloud sync: Updating local state...");
         S = data;
@@ -754,8 +751,20 @@ const startCloudSync = () => {
         initApp();
       }
     } else {
-      // First time initialization if cloud is empty
-      save();
+      // If the cloud document is missing, it means a reset occurred elsewhere.
+      // We should NOT auto-save local data to the cloud here.
+      // Instead, we notify the user or just clear local if it's not a fresh install.
+      const localData = localStorage.getItem('rp_v2');
+      if(localData && !isSaving) {
+        console.warn("Cloud data is missing. Remote reset detected.");
+        if(confirm("Database has been reset on another device. Reset this device too?")){
+          localStorage.removeItem('rp_v2');
+          location.reload();
+        }
+      } else if (!isSaving) {
+        // Fresh install, go ahead and save initial defaults to cloud
+        save();
+      }
     }
   }, err => {
     console.error("Snapshot listener error:", err);
