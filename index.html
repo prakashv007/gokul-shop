@@ -749,6 +749,7 @@ let currentUser=null; // This will store the local user object after login
 let pndFilter='pending';
 
 let isSaving = false;
+let isCloudReady = false; // Prevent saving to cloud until we know the current cloud state
 
 const startCloudSync = () => {
   if(!db) return;
@@ -756,45 +757,43 @@ const startCloudSync = () => {
     if(doc.exists){
       const data = doc.data();
       if(!isSaving && JSON.stringify(data) !== JSON.stringify(S)){
-        console.log("Cloud sync: Updating local state...");
+        console.log("Cloud sync: Remote update received. Updating local...");
         S = data;
         localStorage.setItem('rp_v2', JSON.stringify(S));
         initApp();
       }
+      isCloudReady = true; // Cloud exists, we are in sync
     } else {
-      // If the cloud document is missing, it means a reset occurred elsewhere.
-      // We should NOT auto-save local data to the cloud here.
-      // Instead, we notify the user or just clear local if it's not a fresh install.
-      const localData = localStorage.getItem('rp_v2');
-      if(localData && !isSaving) {
-        console.warn("Cloud data is missing. Remote reset detected.");
-        if(confirm("Database has been reset on another device. Reset this device too?")){
-          localStorage.removeItem('rp_v2');
-          location.reload();
-        }
-      } else if (!isSaving) {
-        // Fresh install, go ahead and save initial defaults to cloud
-        save();
+      // Cloud document is MISSING
+      const localRaw = localStorage.getItem('rp_v2');
+      if(localRaw && !isSaving) {
+        // We have local data but cloud is empty. This means a RESET happened elsewhere.
+        console.warn("Remote reset detected. Purging local data to maintain integrity.");
+        localStorage.removeItem('rp_v2');
+        alert("The database was cleared from another device. This device will now reset.");
+        location.reload();
+      } else {
+        // Brand new install, no local data, no cloud data.
+        isCloudReady = true;
+        save(); // Initialize cloud with defaults
       }
     }
   }, err => {
     console.error("Snapshot listener error:", err);
+    // On error, we still allow local usage but don't mark cloud as ready
   });
 };
 
 const save = async () => {
   localStorage.setItem('rp_v2', JSON.stringify(S));
-  if(db){
+  if(db && isCloudReady){
     isSaving = true;
     try {
       await db.collection('appData').doc('main').set(S);
-      console.log("Cloud sync: Saved successfully.");
+      console.log("Cloud sync: Data pushed to remote.");
     } catch(e) {
-      console.error("Cloud sync failed", e);
-      toast('Sync failed','err');
+      console.error("Cloud push failed", e);
     } finally {
-      // Wait a bit before allowing snapshots to update state again 
-      // to ensure our own write doesn't trigger a flickering reload
       setTimeout(() => { isSaving = false; }, 1000);
     }
   }
