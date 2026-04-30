@@ -1076,6 +1076,8 @@ function completeSale(){
   clearCart();
   document.getElementById('cart-sheet').classList.remove('open');
   document.getElementById('sale-cust').value='';
+  document.getElementById('sale-phone').value='';
+  document.getElementById('sale-paid').value='';
   document.getElementById('sale-disc').value='';
   showReceipt(sale,savedCart);
   toast('Sale completed!');
