@@ -14,22 +14,22 @@
 <style>
 :root{
   --bg:#f8f5f2;
-  --mesh:radial-gradient(at 0% 0%, hsla(30,30%,95%,1) 0, transparent 50%), 
-         radial-gradient(at 100% 0%, hsla(20,40%,92%,1) 0, transparent 50%),
-         radial-gradient(at 50% 100%, hsla(40,50%,96%,1) 0, transparent 50%);
+  --mesh:radial-gradient(at 0% 0%, hsla(150,20%,95%,1) 0, transparent 50%), 
+         radial-gradient(at 100% 0%, hsla(160,30%,92%,1) 0, transparent 50%),
+         radial-gradient(at 50% 100%, hsla(140,20%,96%,1) 0, transparent 50%);
   --s1:rgba(255,255,255,0.85);
   --s2:#fcfaf9;
-  --s3:rgba(217,119,6,0.08);
+  --s3:rgba(16,185,129,0.08);
   --glass:blur(16px) saturate(140%);
   --border:rgba(45,36,30,0.08);
   --border2:rgba(45,36,30,0.04);
   --text:#2d241e;
   --text2:#5c534e;
   --text3:#948c88;
-  --accent:linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  --accent-s:#d97706;
-  --accent-d:rgba(217,119,6,0.1);
-  --green:#16a34a;
+  --accent:linear-gradient(135deg, #059669 0%, #047857 100%);
+  --accent-s:#059669;
+  --accent-d:rgba(16,185,129,0.1);
+  --green:#10b981;
   --red:#dc2626;
   --nav:72px;
   --hdr:64px;
@@ -37,8 +37,8 @@
   --r2:28px;
   --f-h:'Plus Jakarta Sans', sans-serif;
   --f-b:'Outfit', sans-serif;
-  --shadow:0 12px 40px rgba(45,36,30,0.08);
-  --glow:0 0 20px rgba(217,119,6,0.2);
+  --shadow:0 12px 40px rgba(45,36,30,0.06);
+  --glow:0 0 20px rgba(16,185,129,0.2);
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:var(--f-b);-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);background-image:var(--mesh);background-attachment:fixed;color:var(--text);line-height:1.6;overflow-x:hidden;letter-spacing:-0.01em;}
@@ -80,7 +80,7 @@ nav{
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--text2);transition:.2s;font-size:0.65rem;font-weight:600;border:none;background:transparent;font-family:inherit;outline:none;}
 .nav-item svg{width:22px;height:22px;stroke-width:2;}
 .nav-item.active{color:var(--accent-s);}
-.nav-item.active svg{transform:translateY(-2px);filter:drop-shadow(0 4px 8px rgba(217,119,6,0.3));}
+.nav-item.active svg{transform:translateY(-2px);filter:drop-shadow(0 4px 8px rgba(16,185,129,0.3));}
 .nav-badge{position:absolute;top:8px;right:25%;background:#fff;color:var(--accent-s);font-size:0.55rem;font-weight:800;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--accent-s);}
 
 /* ── CARDS ── */
@@ -148,7 +148,7 @@ nav{
 .prod-card{background:var(--s1);backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:.4s cubic-bezier(0.16, 1, 0.3, 1);position:relative;overflow:hidden;box-shadow:var(--shadow);}
 .prod-card:hover{transform:translateY(-4px);border-color:var(--accent-s);box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(77,161,255,0.1);}
 .prod-card:active{transform:scale(.95);}
-.prod-card.in-cart{border-color:var(--accent-s);background:rgba(255,255,255,0.9);box-shadow:0 15px 30px rgba(217,119,6,0.15);}
+.prod-card.in-cart{border-color:var(--accent-s);background:rgba(255,255,255,0.9);box-shadow:0 15px 30px rgba(16,185,129,0.15);}
 .prod-card.in-cart .prod-name{color:var(--accent-s);}
 .prod-card.out{opacity:.5;pointer-events:none;filter:grayscale(1);}
 .prod-name{font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
@@ -444,7 +444,7 @@ nav{
         </div>
       </div>
 
-      <div class="card" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:none;box-shadow:0 12px 30px rgba(245,158,11,0.25);">
+      <div class="card" style="background:linear-gradient(135deg, #059669 0%, #064e3b 100%);color:#fff;border:none;box-shadow:0 12px 30px rgba(5,150,105,0.25);">
         <div class="flex-between">
           <div>
             <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;opacity:.95;letter-spacing:.05em;">Pending Collection</div>
@@ -529,7 +529,7 @@ nav{
           <div class="stat-lbl">Total Due</div>
           <div class="stat-val text-red" id="pnd-total">₹0</div>
         </div>
-        <div class="stat-card" style="border-left:4px solid #d97706;">
+        <div class="stat-card" style="border-left:4px solid #059669;">
           <div class="stat-lbl">Customers</div>
           <div class="stat-val" id="pnd-custs">0</div>
         </div>
@@ -974,7 +974,7 @@ function renderDash(){
   const recent = [...S.sales].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
   const recentEl = document.getElementById('dash-recent');
   if(recentEl) recentEl.innerHTML = recent.length ? recent.map(s => `
-    <div class="card card-sm" style="margin-bottom:.75rem; border-left:4px solid ${s.total===s.paid?'#16a34a':'#d97706'};">
+    <div class="card card-sm" style="margin-bottom:.75rem; border-left:4px solid ${s.total===s.paid?'#10b981':'#059669'};">
       <div class="flex-between">
         <div>
           <div class="li-main">${s.customer}</div>
