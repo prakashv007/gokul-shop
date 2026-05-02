@@ -1789,9 +1789,8 @@
               <select class="bill-inp" id="sale-method"></select>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;">
-              <input class="bill-inp" id="sale-disc" type="number" placeholder="Discount %" min="0" max="100"
-                oninput="updateCartUI()">
-              <input class="bill-inp" id="sale-gst" type="number" placeholder="GST %" min="0" oninput="updateCartUI()">
+              <input class="bill-inp" id="sale-disc" type="number" placeholder="Discount (₹)" min="0" oninput="updateCartUI()">
+              <input class="bill-inp" id="sale-gst" type="number" placeholder="GST (₹)" min="0" oninput="updateCartUI()">
             </div>
             <button class="bill-complete-btn" onclick="completeSale()" id="complete-sale-btn">✅ Complete Sale <span
                 style="font-size:.75rem;opacity:.7;">(Ctrl+B)</span></button>
@@ -2509,15 +2508,13 @@
       <div class="bill-line-total">${fmt(c.price * c.qty)}</div>
     </div>`).join('');
       const sub = cart.reduce((a, c) => a + c.price * c.qty, 0);
-      const discPct = parseFloat(document.getElementById('sale-disc').value) || 0;
-      const discAmt = Math.round(sub * discPct / 100);
-      const gstPct = parseFloat(document.getElementById('sale-gst').value) || 0;
-      const gstAmt = Math.round((sub - discAmt) * gstPct / 100);
+      const discAmt = parseFloat(document.getElementById('sale-disc').value) || 0;
+      const gstAmt = parseFloat(document.getElementById('sale-gst').value) || 0;
       const total = sub - discAmt + gstAmt;
       if (billTotals) billTotals.innerHTML = `
     <div class="bill-tot-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
-    ${discAmt ? `<div class="bill-tot-row"><span>Discount (${discPct}%)</span><span style="color:#dc3545;">-${fmt(discAmt)}</span></div>` : ''}
-    ${gstAmt ? `<div class="bill-tot-row"><span>GST (${gstPct}%)</span><span>+${fmt(gstAmt)}</span></div>` : ''}
+    ${discAmt ? `<div class="bill-tot-row"><span>Discount</span><span style="color:#dc3545;">-${fmt(discAmt)}</span></div>` : ''}
+    ${gstAmt ? `<div class="bill-tot-row"><span>GST</span><span>+${fmt(gstAmt)}</span></div>` : ''}
     <div class="bill-grand"><span>TOTAL</span><span>${fmt(total)}</span></div>`;
       const paidEl = document.getElementById('sale-paid');
       if (paidEl) paidEl.placeholder = 'Amount paid (₹' + total.toLocaleString('en-IN') + ')';
@@ -2541,10 +2538,8 @@
     function completeSale() {
       if (!cart.length) { toast('Bill is empty', 'err'); return; }
       const sub = cart.reduce((a, c) => a + c.price * c.qty, 0);
-      const discPct = parseFloat(document.getElementById('sale-disc').value) || 0;
-      const discAmt = Math.round(sub * discPct / 100);
-      const gstPct = parseFloat(document.getElementById('sale-gst').value) || 0;
-      const gstAmt = Math.round((sub - discAmt) * gstPct / 100);
+      const discAmt = parseFloat(document.getElementById('sale-disc').value) || 0;
+      const gstAmt = parseFloat(document.getElementById('sale-gst').value) || 0;
       const total = sub - discAmt + gstAmt;
       const paid = parseFloat(document.getElementById('sale-paid').value) || total;
       const customer = document.getElementById('sale-cust').value.trim() || 'Guest';
@@ -2554,7 +2549,7 @@
         id: uid(), receipt: 'RCP-' + String(1000 + S.sales.length + 1).padStart(4, '0'),
         date: new Date().toISOString(), customer,
         items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, cost: c.cost, qty: c.qty })),
-        subtotal: sub, discount: discAmt, gst: gstAmt, gstPct, total, paid, method
+        subtotal: sub, discount: discAmt, gst: gstAmt, total, paid, method
       };
       S.sales.push(sale);
       cart.forEach(c => { const p = S.products.find(x => x.id === c.id); if (p) p.qty -= c.qty; });
@@ -2584,7 +2579,7 @@
       document.getElementById('r-totals').innerHTML = `
     <div class="receipt-row"><span>Subtotal</span><span>${fmt(sale.subtotal)}</span></div>
     ${sale.discount ? `<div class="receipt-row"><span>Discount</span><span>-${fmt(sale.discount)}</span></div>` : ''}
-    ${sale.gst ? `<div class="receipt-row"><span>GST (${sale.gstPct}%)</span><span>+${fmt(sale.gst)}</span></div>` : ''}
+    ${sale.gst ? `<div class="receipt-row"><span>GST</span><span>+${fmt(sale.gst)}</span></div>` : ''}
     <div class="receipt-total"><span>TOTAL</span><span>${fmt(sale.total)}</span></div>
     <div class="receipt-row" style="margin-top:.4rem;"><span>Paid (${sale.method})</span><span>${fmt(sale.paid)}</span></div>
     ${sale.total - sale.paid > 0 ? `<div class="receipt-row" style="color:#dc3545;"><span>Balance Due</span><span>${fmt(sale.total - sale.paid)}</span></div>` : ''}`;
@@ -2611,7 +2606,7 @@
       items.forEach(i => w.document.write(`<div class="row"><span>${i.name} x${i.qty}</span><span>${fmt(i.price * i.qty)}</span></div>`));
       w.document.write(`<hr><div class="row"><span>Subtotal</span><span>${fmt(sale.subtotal)}</span></div>`);
       if (sale.discount) w.document.write(`<div class="row"><span>Discount</span><span>-${fmt(sale.discount)}</span></div>`);
-      if (sale.gst) w.document.write(`<div class="row"><span>GST (${sale.gstPct}%)</span><span>+${fmt(sale.gst)}</span></div>`);
+      if (sale.gst) w.document.write(`<div class="row"><span>GST</span><span>+${fmt(sale.gst)}</span></div>`);
       w.document.write(`<div class="row total"><span>TOTAL</span><span>${fmt(sale.total)}</span></div><div class="row"><span>Paid (${sale.method})</span><span>${fmt(sale.paid)}</span></div>`);
       if (sale.total - sale.paid > 0) w.document.write(`<div class="row" style="color:red;"><span>Balance</span><span>${fmt(sale.total - sale.paid)}</span></div>`);
       w.document.write(`<div class="footer">${S.settings.footer || 'Thank you for shopping!'}</div></body></html>`);
