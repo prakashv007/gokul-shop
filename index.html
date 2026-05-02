@@ -774,12 +774,12 @@ let pndFilter='pending';
 let isSaving = false;
 let isCloudReady = false; // Prevent saving to cloud until we know the current cloud state
 
+let _unsubSnapshot = null;
 const startCloudSync = () => {
   if(!db) return;
-  db.collection('appData').doc('main').onSnapshot(doc => {
+  _unsubSnapshot = db.collection('appData').doc('main').onSnapshot(doc => {
     if(doc.exists){
       const data = doc.data();
-      // Sole source of truth update
       if(!isSaving){
         console.log("Cloud update received. Refreshing UI...");
         S = data;
@@ -791,7 +791,7 @@ const startCloudSync = () => {
       console.warn("Cloud document not found. Initializing with defaults...");
       isCloudReady = true;
       isCloudLoaded = true;
-      save(); // Push defaults to new cloud doc
+      save();
       initApp();
     }
   }, err => {
@@ -1686,25 +1686,34 @@ function deleteRestock(id){
 }
 
 async function factoryReset(){
-  if(!confirm('WIPE DATA? This will delete all Products, Sales, and Restocks, but keep your Categories and Settings.'))return;
-  const c=prompt("Type DELETE to confirm:");
-  if(c==='DELETE'){
-    if(db){
-      try {
-        isCloudReady = false; // Stop sync engine
-        S.products = [];
-        S.sales = [];
-        S.restocks = [];
-        // Keep Categories, Brands, Suppliers, Settings etc.
-        await db.collection('appData').doc('main').set(S);
-        console.log("Data wiped, settings preserved.");
-        sessionStorage.clear();
-        location.reload();
-      } catch(e){
-        console.error("Wipe failed", e);
-        toast('Wipe failed','err');
-      }
-    }
+  if(!confirm('Reset? This deletes all Products, Sales & Restocks but keeps your Dropdowns and Settings.'))return;
+  const c=prompt('Type DELETE to confirm:');
+  if(c!=='DELETE')return;
+  if(!db){toast('No database connection','err');return;}
+  try{
+    toast('Wiping...');
+    // 1. Stop live listener so it cannot reload old data
+    if(_unsubSnapshot){ _unsubSnapshot(); _unsubSnapshot=null; }
+    isCloudReady = false;
+    // 2. Build clean state - preserve dropdowns and settings only
+    const cleanState = {
+      lang: S.lang||'en',
+      products: [],
+      sales: [],
+      restocks: [],
+      paymentLogs: [],
+      extraUsers: S.extraUsers||[],
+      filters: JSON.parse(JSON.stringify(S.filters)),
+      settings: JSON.parse(JSON.stringify(S.settings))
+    };
+    // 3. Force overwrite in Firestore
+    await db.collection('appData').doc('main').set(cleanState);
+    console.log('Factory Reset complete.');
+    sessionStorage.clear();
+    location.reload();
+  } catch(e){
+    console.error('Reset failed',e);
+    toast('Reset failed: '+e.message,'err');
   }
 }
 
