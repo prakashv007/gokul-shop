@@ -147,10 +147,10 @@ nav{
 .li-sub{font-size:.75rem;color:var(--text3);margin-top:3px;}
 
 /* ── POS SPLIT LAYOUT ── */
-#pg-pos{padding:0!important;display:none;height:calc(100vh - var(--hdr));overflow:hidden;}
+#pg-pos{padding:0!important;display:none;height:calc(100vh - var(--hdr) - var(--nav) - 2.4rem);overflow:hidden;margin-top:0;}
 #pg-pos.active{display:flex!important;}
 .pos-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;}
-.pos-right{width:380px;display:flex;flex-direction:column;background:var(--s1);overflow:hidden;}
+.pos-right{width:360px;display:flex;flex-direction:column;background:var(--s1);overflow:hidden;}
 .pos-toolbar{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;align-items:center;background:rgba(255,255,255,0.7);backdrop-filter:var(--glass);}
 .pos-search-wrap{position:relative;flex:1;}
 .pos-search-wrap input{padding:.65rem 1rem .65rem 2.5rem;font-size:.9rem;}
@@ -186,12 +186,12 @@ nav{
 .bqb.del-btn{color:var(--red);}
 .bill-qty-val{min-width:22px;text-align:center;font-size:.85rem;font-weight:700;}
 .bill-line-total{font-size:.85rem;font-weight:800;color:var(--accent-s);min-width:55px;text-align:right;}
-.bill-footer{padding:.85rem 1rem;border-top:1px solid var(--border);background:var(--s2);}
-.bill-totals{margin-bottom:.75rem;}
-.bill-tot-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text2);margin-bottom:.35rem;}
-.bill-grand{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:800;color:var(--text);padding-top:.5rem;border-top:2px solid var(--border);margin-bottom:.75rem;}
-.bill-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;}
-.bill-inp{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.55rem .75rem;font-size:.85rem;font-family:inherit;color:var(--text);outline:none;}
+.bill-footer{padding:.6rem .75rem;border-top:1px solid var(--border);background:var(--s2);overflow-y:auto;}
+.bill-totals{margin-bottom:.5rem;}
+.bill-tot-row{display:flex;justify-content:space-between;font-size:.82rem;color:var(--text2);margin-bottom:.25rem;}
+.bill-grand{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:800;color:var(--text);padding-top:.4rem;border-top:2px solid var(--border);margin-bottom:.5rem;}
+.bill-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.4rem;}
+.bill-inp{width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;padding:.45rem .6rem;font-size:.8rem;font-family:inherit;color:var(--text);outline:none;}
 .bill-inp:focus{border-color:var(--accent-s);}
 .bill-complete-btn{width:100%;padding:.85rem;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:800;cursor:pointer;transition:.2s;}
 .bill-complete-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
