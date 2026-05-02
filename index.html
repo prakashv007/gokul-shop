@@ -311,7 +311,6 @@ nav{
     <div class="modal-hdr"><div class="modal-title" id="stock-modal-title">Add Product</div><button class="modal-close" onclick="closeOv('stock')">×</button></div>
     <div class="modal-body">
       <input type="hidden" id="sm-edit-id">
-      <div class="inp-row"><label class="inp-lbl">Product Name *</label><input class="inp" id="sm-name" placeholder="e.g. Cotton Saree"></div>
       <div class="inp-row"><label class="inp-lbl">SKU / Barcode</label><input class="inp" id="sm-sku" placeholder="SKU-001"></div>
       <div class="inp-grid" style="margin-bottom:.85rem;">
         <div><label class="inp-lbl">Category</label><select class="inp" id="sm-cat"></select></div>
@@ -1172,7 +1171,6 @@ function openStockModal(editId){
   if(editId){
     const p=S.products.find(x=>x.id===editId);
     if(p){
-      document.getElementById('sm-name').value=p.name;
       document.getElementById('sm-sku').value=p.sku||'';
       document.getElementById('sm-cost').value=p.cost;
       document.getElementById('sm-price').value=p.price;
@@ -1189,18 +1187,20 @@ function openStockModal(editId){
       },50);
     }
   } else {
-    ['sm-name','sm-sku','sm-cost','sm-price','sm-qty','sm-low','sm-notes'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+    ['sm-sku','sm-cost','sm-price','sm-qty','sm-low','sm-notes'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   }
   populateSelects();
   openOv('stock');
 }
 
 function saveStock(){
-  const name=document.getElementById('sm-name').value.trim();
+  const cat=document.getElementById('sm-cat').value;
+  const sub=document.getElementById('sm-subcat').value;
+  const name=(cat + ' ' + sub).trim() || 'Untitled Product';
   const cost=parseFloat(document.getElementById('sm-cost').value)||0;
   const price=parseFloat(document.getElementById('sm-price').value)||0;
   const qty=parseInt(document.getElementById('sm-qty').value)||0;
-  if(!name||!price){toast('Name & price required','err');return;}
+  if(!cat||!price){toast('Category & price required','err');return;}
   const editId=document.getElementById('sm-edit-id').value;
   const data={
     name,sku:document.getElementById('sm-sku').value,
