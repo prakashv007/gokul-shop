@@ -66,8 +66,10 @@ header{
 
 #shell{display:flex;flex-direction:column;height:100vh;height:100svh;overflow:hidden;}
 main{flex:1;overflow-y:auto;padding:calc(var(--hdr) + 1.2rem) 0 calc(var(--nav) + 1.2rem);-webkit-overflow-scrolling:touch;}
+#pg-pos.active ~ * {display:none;} /* When POS is open, hide other pages scroll */
 .page{display:none;padding:0 1.2rem;animation:fadeUp .3s cubic-bezier(0.16, 1, 0.3, 1);}
 .page.active{display:block;}
+#pg-pos.active{display:flex!important;padding:0!important;height:calc(100vh - var(--hdr) - var(--nav) - 2.4rem);margin-top:calc(var(--hdr) + .4rem);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── BOTTOM NAV ── */
@@ -144,18 +146,59 @@ nav{
 .li-main{font-weight:600;font-size:.95rem;color:var(--text);}
 .li-sub{font-size:.75rem;color:var(--text3);margin-top:3px;}
 
-/* ── POS GRID ── */
-.pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;}
-.prod-card{background:var(--s1);backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:.4s cubic-bezier(0.16, 1, 0.3, 1);position:relative;overflow:hidden;box-shadow:var(--shadow);}
-.prod-card:hover{transform:translateY(-4px);border-color:var(--accent-s);box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(77,161,255,0.1);}
-.prod-card:active{transform:scale(.95);}
-.prod-card.in-cart{border-color:var(--accent-s);background:rgba(255,255,255,0.9);box-shadow:0 15px 30px rgba(16,185,129,0.15);}
-.prod-card.in-cart .prod-name{color:var(--accent-s);}
-.prod-card.out{opacity:.5;pointer-events:none;filter:grayscale(1);}
-.prod-name{font-size:.9rem;font-weight:700;margin-bottom:.3rem;}
-.prod-meta{font-size:.7rem;color:var(--text3);margin-bottom:.6rem;font-weight:500;}
-.prod-price{color:var(--accent-s);font-weight:800;font-size:1.05rem;}
-.prod-stock-badge{position:absolute;top:.7rem;right:.7rem;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:30px;background:var(--s2);backdrop-filter:var(--glass);border:1px solid var(--border);}
+/* ── POS SPLIT LAYOUT ── */
+#pg-pos{padding:0!important;display:none;height:calc(100vh - var(--hdr));overflow:hidden;}
+#pg-pos.active{display:flex!important;}
+.pos-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;}
+.pos-right{width:380px;display:flex;flex-direction:column;background:var(--s1);overflow:hidden;}
+.pos-toolbar{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;align-items:center;background:rgba(255,255,255,0.7);backdrop-filter:var(--glass);}
+.pos-search-wrap{position:relative;flex:1;}
+.pos-search-wrap input{padding:.65rem 1rem .65rem 2.5rem;font-size:.9rem;}
+.pos-search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.95rem;pointer-events:none;}
+.pos-autocomplete{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:0 20px 40px rgba(0,0,0,0.12);z-index:500;max-height:280px;overflow-y:auto;margin-top:4px;}
+.pos-ac-item{padding:.7rem 1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2);transition:.15s;}
+.pos-ac-item:hover{background:var(--accent-d);}
+.pos-ac-name{font-weight:600;font-size:.9rem;}
+.pos-ac-meta{font-size:.72rem;color:var(--text3);margin-top:2px;}
+.pos-ac-price{font-weight:800;color:var(--accent-s);font-size:.9rem;}
+.pos-ac-stock{font-size:.7rem;font-weight:700;}
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;padding:1rem;overflow-y:auto;flex:1;align-content:start;}
+.prod-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:.75rem;cursor:pointer;transition:.2s;position:relative;overflow:hidden;}
+.prod-card:hover{border-color:var(--accent-s);box-shadow:0 4px 16px rgba(5,150,105,0.15);transform:translateY(-1px);}
+.prod-card:active{transform:scale(.97);}
+.prod-card.in-cart{border-color:var(--accent-s);background:rgba(5,150,105,0.05);}
+.prod-card.out{opacity:.45;pointer-events:none;}
+.prod-name{font-size:.82rem;font-weight:700;margin-bottom:.25rem;line-height:1.3;}
+.prod-meta{font-size:.67rem;color:var(--text3);margin-bottom:.5rem;}
+.prod-price{color:var(--accent-s);font-weight:800;font-size:1rem;}
+.prod-stock-badge{position:absolute;top:.5rem;right:.5rem;font-size:.6rem;font-weight:800;padding:.15rem .45rem;border-radius:20px;}
+/* POS RIGHT PANEL */
+.bill-hdr{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.bill-hdr-title{font-size:1rem;font-weight:800;}
+.bill-items{flex:1;overflow-y:auto;padding:.5rem .75rem;}
+.bill-row{display:flex;align-items:center;gap:.5rem;padding:.55rem 0;border-bottom:1px solid var(--border2);}
+.bill-row:last-child{border-bottom:none;}
+.bill-name{flex:1;font-size:.85rem;font-weight:600;line-height:1.3;}
+.bill-sub{font-size:.7rem;color:var(--text3);}
+.bill-qty-ctrl{display:flex;align-items:center;gap:.3rem;}
+.bqb{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--s2);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:.15s;}
+.bqb:hover{background:var(--accent-s);color:#fff;border-color:var(--accent-s);}
+.bqb.del-btn{color:var(--red);}
+.bill-qty-val{min-width:22px;text-align:center;font-size:.85rem;font-weight:700;}
+.bill-line-total{font-size:.85rem;font-weight:800;color:var(--accent-s);min-width:55px;text-align:right;}
+.bill-footer{padding:.85rem 1rem;border-top:1px solid var(--border);background:var(--s2);}
+.bill-totals{margin-bottom:.75rem;}
+.bill-tot-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text2);margin-bottom:.35rem;}
+.bill-grand{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:800;color:var(--text);padding-top:.5rem;border-top:2px solid var(--border);margin-bottom:.75rem;}
+.bill-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;}
+.bill-inp{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.55rem .75rem;font-size:.85rem;font-family:inherit;color:var(--text);outline:none;}
+.bill-inp:focus{border-color:var(--accent-s);}
+.bill-complete-btn{width:100%;padding:.85rem;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:1rem;font-weight:800;cursor:pointer;transition:.2s;}
+.bill-complete-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.bill-complete-btn:active{transform:scale(.98);}
+.bill-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:.75rem;opacity:.6;}
+.kbd-hint{font-size:.65rem;color:var(--text3);text-align:center;margin-top:.4rem;}
+.kbd{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.65rem;font-weight:700;}
 
 /* ── CART SHEET ── */
 #cart-sheet{
@@ -299,6 +342,7 @@ nav{
         <svg viewBox="0 0 24 24" width="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.659 1.432 5.631 1.433h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         WhatsApp
       </button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="printReceipt()">🖨 Print</button>
       <button class="btn btn-gold" style="flex:1;" onclick="closeOv('receipt')">Done</button>
     </div>
   </div>
@@ -458,31 +502,48 @@ nav{
       <div id="dash-recent"></div>
     </div>
 
-    <!-- POS -->
+    <!-- POS (Split Panel) -->
     <div class="page" id="pg-pos">
-      <div style="margin-bottom:1.2rem;">
-        <div class="flex-between">
-          <div>
-            <div style="font-size:1.6rem;font-weight:800;color:var(--text);">Store</div>
-            <div style="font-size:.85rem;color:var(--text3);font-weight:500;">Quickly add items to cart</div>
+      <!-- LEFT: Product Search -->
+      <div class="pos-left">
+        <div class="pos-toolbar">
+          <div class="pos-search-wrap">
+            <span class="pos-search-icon">🔍</span>
+            <input type="text" class="inp" id="pos-search" placeholder="Search by name, category, SKU... (Enter to add)" oninput="posSearch()" onkeydown="posSearchKey(event)" autocomplete="off">
+            <div class="pos-autocomplete" id="pos-ac" style="display:none;"></div>
           </div>
-          <div class="hdr-user" onclick="toggleCart()" style="width:48px;height:48px;border-radius:16px;background:var(--accent);color:#fff;border:none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-            <div class="nav-badge" id="pos-cart-n" style="top:-5px;right:-5px;">0</div>
+          <select class="inp" id="pos-cat" onchange="renderPOS()" style="width:140px;padding:.65rem .75rem;font-size:.82rem;"></select>
+          <button class="btn btn-ghost btn-sm" onclick="renderPOS()" title="Refresh">⟳</button>
+        </div>
+        <div class="pos-grid" id="pos-list"></div>
+      </div>
+      <!-- RIGHT: Bill Panel -->
+      <div class="pos-right">
+        <div class="bill-hdr">
+          <div class="bill-hdr-title">🧾 Bill <span id="bill-count" style="font-size:.8rem;color:var(--text3);font-weight:500;">(0 items)</span></div>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-ghost btn-xs" onclick="clearCart()" title="New Bill (Ctrl+N)">🗑 Clear</button>
           </div>
         </div>
+        <div class="bill-items" id="bill-items">
+          <div class="bill-empty"><div style="font-size:2.5rem;">🛒</div><div>Add products to bill</div><div class="kbd-hint">Click product or press <kbd class="kbd">Enter</kbd></div></div>
+        </div>
+        <div class="bill-footer">
+          <div class="bill-totals" id="bill-totals"></div>
+          <div class="bill-inputs">
+            <input class="bill-inp" id="sale-cust" placeholder="Customer name">
+            <input class="bill-inp" id="sale-phone" type="tel" placeholder="Mobile (opt.)">
+            <input class="bill-inp" id="sale-paid" type="number" placeholder="Amount paid (₹)" oninput="updateCartUI()">
+            <select class="bill-inp" id="sale-method"></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem;">
+            <input class="bill-inp" id="sale-disc" type="number" placeholder="Discount %" min="0" max="100" oninput="updateCartUI()">
+            <input class="bill-inp" id="sale-gst" type="number" placeholder="GST %" min="0" oninput="updateCartUI()">
+          </div>
+          <button class="bill-complete-btn" onclick="completeSale()" id="complete-sale-btn">✅ Complete Sale <span style="font-size:.75rem;opacity:.7;">(Ctrl+B)</span></button>
+          <div class="kbd-hint" style="margin-top:.4rem;">Ctrl+N = New Bill &nbsp;|&nbsp; +/- = Qty</div>
+        </div>
       </div>
-
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" class="inp" id="pos-search" placeholder="Search products..." oninput="renderPOS()">
-      </div>
-
-      <div class="card card-sm" style="margin-bottom:1.2rem;overflow:hidden;padding:0;">
-        <select class="inp" id="pos-cat" onchange="renderPOS()" style="border:none;background:transparent;font-weight:700;padding:1rem;"></select>
-      </div>
-
-      <div class="pos-grid" id="pos-list"></div>
     </div>
 
     <!-- INVENTORY -->
@@ -788,9 +849,11 @@ const startCloudSync = () => {
         initApp();
       }
     } else {
-      console.warn("Cloud document not found. Initializing with defaults...");
+      console.warn("Cloud document not found. Starting fresh.");
       isCloudReady = true;
       isCloudLoaded = true;
+      // Save a guaranteed clean default - NO demo data
+      S = JSON.parse(JSON.stringify(DEFAULTS));
       save();
       initApp();
     }
@@ -1054,8 +1117,40 @@ function renderPOS(){
   }).join(''):'<div class="empty-state" style="grid-column:1/-1;">No products found</div>';
 }
 
-// ══════════════════════════════════════════════════
-//  CART
+// ── POS AUTOCOMPLETE & SHORTCUTS ──
+let posAcIdx=-1;
+function posSearch(){
+  const q=(document.getElementById('pos-search').value||'').trim().toLowerCase();
+  const ac=document.getElementById('pos-ac');
+  renderPOS();
+  if(!q){ac.style.display='none';return;}
+  const matches=S.products.filter(p=>p.qty>0&&(p.name.toLowerCase().includes(q)||(p.sku||'').toLowerCase().includes(q)||p.category.toLowerCase().includes(q))).slice(0,8);
+  if(!matches.length){ac.style.display='none';return;}
+  posAcIdx=-1;
+  ac.innerHTML=matches.map(p=>`<div class="pos-ac-item" onclick="addToCartFromAC('${p.id}')">
+    <div><div class="pos-ac-name">${p.name}</div><div class="pos-ac-meta">${p.category}${p.sku?' · '+p.sku:''}</div></div>
+    <div style="text-align:right"><div class="pos-ac-price">${fmt(p.price)}</div><div class="pos-ac-stock" style="color:${p.qty<=S.settings.lowStock?'#fd7e14':'#28a745'}">${p.qty} left</div></div>
+  </div>`).join('');
+  ac.style.display='block';
+}
+function addToCartFromAC(id){document.getElementById('pos-ac').style.display='none';document.getElementById('pos-search').value='';addToCart(id);renderPOS();document.getElementById('pos-search').focus();}
+function posSearchKey(e){
+  const ac=document.getElementById('pos-ac');const items=ac.querySelectorAll('.pos-ac-item');
+  if(e.key==='ArrowDown'){e.preventDefault();posAcIdx=Math.min(posAcIdx+1,items.length-1);items.forEach((el,i)=>el.style.background=i===posAcIdx?'var(--accent-d)':'');}
+  else if(e.key==='ArrowUp'){e.preventDefault();posAcIdx=Math.max(posAcIdx-1,0);items.forEach((el,i)=>el.style.background=i===posAcIdx?'var(--accent-d)':'');}
+  else if(e.key==='Enter'){e.preventDefault();
+    if(posAcIdx>=0&&items[posAcIdx])items[posAcIdx].click();
+    else if(items.length===1)items[0].click();
+    else{const q=document.getElementById('pos-search').value.toLowerCase();const p=S.products.find(x=>x.qty>0&&x.name.toLowerCase().includes(q));if(p)addToCartFromAC(p.id);}
+  }else if(e.key==='Escape'){ac.style.display='none';document.getElementById('pos-search').value='';renderPOS();}
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.pos-search-wrap')){const ac=document.getElementById('pos-ac');if(ac)ac.style.display='none';}});
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.key==='b'){e.preventDefault();completeSale();}
+  if(e.ctrlKey&&e.key==='n'){e.preventDefault();clearCart();const s=document.getElementById('pos-search');if(s)s.focus();}
+  if(e.ctrlKey&&e.key==='p'){e.preventDefault();printReceipt();}
+});
+
 // ══════════════════════════════════════════════════
 function addToCart(id){
   const p=S.products.find(x=>x.id===id);
@@ -1072,49 +1167,56 @@ function addToCart(id){
   updateCartUI();
 }
 
-function toggleCart(){document.getElementById('cart-sheet').classList.toggle('open');}
-function clearCart(){cart=[];updateCartUI();document.getElementById('cart-sheet').classList.remove('open');}
+function toggleCart(){}
+function clearCart(){cart=[];updateCartUI();toast('Bill cleared');}
 
 function updateCartUI(){
-  // Update POS highlights
-  document.querySelectorAll('.prod-card').forEach(el => {
-    const idAttr = el.getAttribute('onclick');
-    if(idAttr){
-      const match = idAttr.match(/'([^']+)'/);
-      if(match){
-        const id = match[1];
-        el.classList.toggle('in-cart', cart.some(c => c.id === id));
-      }
-    }
+  document.querySelectorAll('.prod-card').forEach(el=>{
+    const m=el.getAttribute('onclick')&&el.getAttribute('onclick').match(/'([^']+)'/);
+    if(m)el.classList.toggle('in-cart',cart.some(c=>c.id===m[1]));
   });
-
-  const list=document.getElementById('cart-items');
-  if(!cart.length){list.innerHTML='<div class="empty-state">Cart is empty</div>';document.getElementById('cart-totals').innerHTML='';document.getElementById('pos-cart-n').textContent='0';document.getElementById('cart-count-badge').textContent='(0)';return;}
-  list.innerHTML=cart.map(c=>`
-    <div class="cart-item">
-      <div style="flex:1;min-width:0;">
-        <div class="ci-name">${c.name}</div>
-        <div class="ci-sub">${c.sku?c.sku+' · ':''}${fmt(c.price)} each</div>
+  const billItems=document.getElementById('bill-items');
+  const billCount=document.getElementById('bill-count');
+  const billTotals=document.getElementById('bill-totals');
+  const posCartN=document.getElementById('pos-cart-n');
+  const cartCountBadge=document.getElementById('cart-count-badge');
+  if(billCount)billCount.textContent='('+cart.reduce((a,c)=>a+c.qty,0)+' items)';
+  if(posCartN)posCartN.textContent=cart.length;
+  if(cartCountBadge)cartCountBadge.textContent='('+cart.reduce((a,c)=>a+c.qty,0)+')';
+  if(!cart.length){
+    if(billItems)billItems.innerHTML='<div class="bill-empty"><div style="font-size:2.5rem;">🛒</div><div>Add products to bill</div><div class="kbd-hint">Click product or press <kbd class="kbd">Enter</kbd></div></div>';
+    if(billTotals)billTotals.innerHTML='';
+    return;
+  }
+  if(billItems)billItems.innerHTML=cart.map(c=>`
+    <div class="bill-row">
+      <div class="bill-name">${c.name}<div class="bill-sub">${fmt(c.price)} each</div></div>
+      <div class="bill-qty-ctrl">
+        <div class="bqb del-btn" onclick="removeCart('${c.id}')" title="Remove">✕</div>
+        <div class="bqb" onclick="cqty('${c.id}',-1)">−</div>
+        <div class="bill-qty-val">${c.qty}</div>
+        <div class="bqb" onclick="cqty('${c.id}',1)">+</div>
       </div>
-      <div class="qty-ctrl">
-        <div class="qty-btn" onclick="cqty('${c.id}',-1)">-</div>
-        <span style="min-width:20px;text-align:center;font-size:.875rem;">${c.qty}</span>
-        <div class="qty-btn" onclick="cqty('${c.id}',1)">+</div>
-      </div>
-      <div class="ci-price">${fmt(c.price*c.qty)}</div>
-      <div class="cart-del" onclick="removeCart('${c.id}')">✕</div>
+      <div class="bill-line-total">${fmt(c.price*c.qty)}</div>
     </div>`).join('');
   const sub=cart.reduce((a,c)=>a+c.price*c.qty,0);
   const discPct=parseFloat(document.getElementById('sale-disc').value)||0;
   const discAmt=Math.round(sub*discPct/100);
-  const total=sub-discAmt;
-  document.getElementById('cart-totals').innerHTML=`
-    <div class="totals-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
-    ${discAmt?`<div class="totals-row"><span>Discount (${discPct}%)</span><span style="color:var(--red);">-${fmt(discAmt)}</span></div>`:''}
-    <div class="totals-total"><span>Total</span><span>${fmt(total)}</span></div>`;
-  document.getElementById('sale-paid').placeholder=total;
-  document.getElementById('pos-cart-n').textContent=cart.length;
-  document.getElementById('cart-count-badge').textContent='('+cart.reduce((a,c)=>a+c.qty,0)+')';
+  const gstPct=parseFloat(document.getElementById('sale-gst').value)||0;
+  const gstAmt=Math.round((sub-discAmt)*gstPct/100);
+  const total=sub-discAmt+gstAmt;
+  if(billTotals)billTotals.innerHTML=`
+    <div class="bill-tot-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+    ${discAmt?`<div class="bill-tot-row"><span>Discount (${discPct}%)</span><span style="color:#dc3545;">-${fmt(discAmt)}</span></div>`:''}
+    ${gstAmt?`<div class="bill-tot-row"><span>GST (${gstPct}%)</span><span>+${fmt(gstAmt)}</span></div>`:''}
+    <div class="bill-grand"><span>TOTAL</span><span>${fmt(total)}</span></div>`;
+  const paidEl=document.getElementById('sale-paid');
+  if(paidEl)paidEl.placeholder='Amount paid (₹'+total.toLocaleString('en-IN')+')';
+  // Legacy cart-items for receipt
+  const ci=document.getElementById('cart-items');
+  if(ci)ci.innerHTML='';
+  const ct=document.getElementById('cart-totals');
+  if(ct)ct.innerHTML='';
 }
 
 function cqty(id,d){
@@ -1128,12 +1230,14 @@ function cqty(id,d){
 function removeCart(id){cart=cart.filter(c=>c.id!==id);updateCartUI();}
 
 function completeSale(){
-  if(!cart.length){toast('Cart is empty','err');return;}
+  if(!cart.length){toast('Bill is empty','err');return;}
   const sub=cart.reduce((a,c)=>a+c.price*c.qty,0);
   const discPct=parseFloat(document.getElementById('sale-disc').value)||0;
   const discAmt=Math.round(sub*discPct/100);
-  const total=sub-discAmt;
-  const paid=parseFloat(document.getElementById('sale-paid').value)||0;
+  const gstPct=parseFloat(document.getElementById('sale-gst').value)||0;
+  const gstAmt=Math.round((sub-discAmt)*gstPct/100);
+  const total=sub-discAmt+gstAmt;
+  const paid=parseFloat(document.getElementById('sale-paid').value)||total;
   const customer=document.getElementById('sale-cust').value.trim()||'Guest';
   const method=document.getElementById('sale-method').value||'Cash';
   if(paid<total&&customer==='Guest'){toast('Enter customer name for credit sale','err');return;}
@@ -1141,21 +1245,20 @@ function completeSale(){
     id:uid(),receipt:'RCP-'+String(1000+S.sales.length+1).padStart(4,'0'),
     date:new Date().toISOString(),customer,
     items:cart.map(c=>({id:c.id,name:c.name,price:c.price,cost:c.cost,qty:c.qty})),
-    subtotal:sub,discount:discAmt,total,paid,method
+    subtotal:sub,discount:discAmt,gst:gstAmt,gstPct,total,paid,method
   };
   S.sales.push(sale);
   cart.forEach(c=>{const p=S.products.find(x=>x.id===c.id);if(p)p.qty-=c.qty;});
   const savedCart=[...cart];
   save();
-  clearCart();
-  document.getElementById('cart-sheet').classList.remove('open');
-  document.getElementById('sale-cust').value='';
-  document.getElementById('sale-phone').value='';
-  document.getElementById('sale-paid').value='';
-  document.getElementById('sale-disc').value='';
-  showReceipt(sale,savedCart);
-  toast('Sale completed!');
+  cart=[];
+  ['sale-cust','sale-phone','sale-paid','sale-disc','sale-gst'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  updateCartUI();
+  renderPOS();
+  renderDash();
   updateNavBadge();
+  showReceipt(sale,savedCart);
+  toast('✅ Sale completed!');
 }
 
 // ══════════════════════════════════════════════════
@@ -1164,18 +1267,21 @@ function completeSale(){
 function showReceipt(sale,items){
   document.getElementById('r-shop-name').textContent=S.settings.name||'Radimade';
   document.getElementById('r-date').textContent=new Date(sale.date).toLocaleString('en-IN');
-  document.getElementById('r-rno').textContent='Receipt: '+sale.receipt;
+  document.getElementById('r-rno').textContent='Invoice: '+sale.receipt;
   document.getElementById('r-items').innerHTML=items.map(i=>`
-    <div class="receipt-row" style="color:var(--text);font-weight:500;margin-bottom:.15rem;"><span>${i.name} x ${i.qty}</span><span>${fmt(i.price*i.qty)}</span></div>
-    ${i.sku?`<div style="font-size:.65rem;color:var(--text3);margin-top:-.2rem;margin-bottom:.4rem;">SKU: ${i.sku}</div>`:''}
+    <div class="receipt-row" style="color:var(--text);font-weight:500;margin-bottom:.15rem;"><span>${i.name} × ${i.qty}</span><span>${fmt(i.price*i.qty)}</span></div>
+    <div style="font-size:.65rem;color:var(--text3);margin-top:-.2rem;margin-bottom:.35rem;">${fmt(i.price)} each${i.sku?' · '+i.sku:''}</div>
   `).join('');
   document.getElementById('r-totals').innerHTML=`
     <div class="receipt-row"><span>Subtotal</span><span>${fmt(sale.subtotal)}</span></div>
     ${sale.discount?`<div class="receipt-row"><span>Discount</span><span>-${fmt(sale.discount)}</span></div>`:''}
-    <div class="receipt-total"><span>Total</span><span>${fmt(sale.total)}</span></div>
+    ${sale.gst?`<div class="receipt-row"><span>GST (${sale.gstPct}%)</span><span>+${fmt(sale.gst)}</span></div>`:''}
+    <div class="receipt-total"><span>TOTAL</span><span>${fmt(sale.total)}</span></div>
     <div class="receipt-row" style="margin-top:.4rem;"><span>Paid (${sale.method})</span><span>${fmt(sale.paid)}</span></div>
-    ${sale.total-sale.paid>0?`<div class="receipt-row" style="color:var(--red);"><span>Balance Due</span><span>${fmt(sale.total-sale.paid)}</span></div>`:''}`;
+    ${sale.total-sale.paid>0?`<div class="receipt-row" style="color:#dc3545;"><span>Balance Due</span><span>${fmt(sale.total-sale.paid)}</span></div>`:''}`;
   document.getElementById('r-footer').textContent=S.settings.footer||'Thank you for shopping!';
+  // Store current sale for print
+  window._lastSale=sale; window._lastItems=items;
   document.getElementById('r-wa-btn').onclick=()=>{
     let msg=`*${S.settings.name||'Radimade'}*\n${new Date(sale.date).toLocaleString('en-IN')}\n${sale.receipt}\n──────────────\n`;
     items.forEach(i=>msg+=`${i.name} × ${i.qty}: ${fmt(i.price*i.qty)}\n`);
@@ -1185,6 +1291,22 @@ function showReceipt(sale,items){
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
   };
   openOv('receipt');
+}
+
+function printReceipt(){
+  const sale=window._lastSale;const items=window._lastItems;
+  if(!sale)return;
+  const w=window.open('','_blank','width=320,height=600');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt</title><style>body{font-family:monospace;font-size:12px;width:280px;margin:0 auto;}h2{text-align:center;font-size:16px;margin:8px 0 2px;}p{text-align:center;margin:2px 0;font-size:11px;}hr{border:1px dashed #999;}.row{display:flex;justify-content:space-between;margin:3px 0;}.total{font-weight:bold;font-size:14px;border-top:1px dashed #999;padding-top:4px;}.footer{text-align:center;margin-top:12px;font-size:11px;border-top:1px dashed #999;padding-top:6px;}</style></head><body>`);
+  w.document.write(`<h2>${S.settings.name||'Radimade'}</h2><p>${new Date(sale.date).toLocaleString('en-IN')}</p><p>${sale.receipt}</p><hr>`);
+  items.forEach(i=>w.document.write(`<div class="row"><span>${i.name} x${i.qty}</span><span>${fmt(i.price*i.qty)}</span></div>`));
+  w.document.write(`<hr><div class="row"><span>Subtotal</span><span>${fmt(sale.subtotal)}</span></div>`);
+  if(sale.discount)w.document.write(`<div class="row"><span>Discount</span><span>-${fmt(sale.discount)}</span></div>`);
+  if(sale.gst)w.document.write(`<div class="row"><span>GST (${sale.gstPct}%)</span><span>+${fmt(sale.gst)}</span></div>`);
+  w.document.write(`<div class="row total"><span>TOTAL</span><span>${fmt(sale.total)}</span></div><div class="row"><span>Paid (${sale.method})</span><span>${fmt(sale.paid)}</span></div>`);
+  if(sale.total-sale.paid>0)w.document.write(`<div class="row" style="color:red;"><span>Balance</span><span>${fmt(sale.total-sale.paid)}</span></div>`);
+  w.document.write(`<div class="footer">${S.settings.footer||'Thank you for shopping!'}</div></body></html>`);
+  w.document.close();w.print();
 }
 
 // ══════════════════════════════════════════════════
@@ -1716,6 +1838,21 @@ async function factoryReset(){
     toast('Reset failed: '+e.message,'err');
   }
 }
+
+// ══ KEYBOARD SHORTCUTS ══
+document.addEventListener('keydown', e => {
+  // Only when POS is active
+  const posActive = document.getElementById('pg-pos').classList.contains('active');
+  if(e.ctrlKey && e.key === 'b'){e.preventDefault(); completeSale(); return;}
+  if(e.ctrlKey && e.key === 'n'){e.preventDefault(); clearCart(); toast('New Bill'); return;}
+  if(posActive){
+    // Focus search on any letter key (not modifier)
+    if(!e.ctrlKey && !e.altKey && e.key.length===1){
+      const s=document.getElementById('pos-search');
+      if(document.activeElement!==s){s.focus();}
+    }
+  }
+});
 
 // ══════════════════════════════════════════════════
 //  OVERLAY HELPERS
