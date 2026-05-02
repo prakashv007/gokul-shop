@@ -125,6 +125,7 @@ nav{
 .btn-ghost:hover{border-color:var(--accent-s);color:var(--accent-s);}
 .btn-red{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(220,53,69,0.2);}
 .btn-green{background:var(--green);color:#fff;box-shadow:0 8px 20px rgba(40,167,69,0.2);}
+.btn-gold{background:linear-gradient(135deg, #d97706 0%, #b45309 100%);color:#fff;box-shadow:0 8px 20px rgba(217,119,6,0.2);}
 .btn-full{width:100%;}
 .btn-sm{padding:.6rem 1rem;font-size:.8rem;}
 .btn-xs{padding:.4rem .8rem;font-size:.75rem;}
@@ -395,7 +396,7 @@ nav{
       <input class="inp" id="auth-pass" type="password" placeholder="••••••••" style="background:var(--s2);">
     </div>
     <button class="btn btn-accent btn-full" onclick="login()" style="margin-top:1rem;height:52px;font-size:1rem;">Sign In</button>
-    <div id="auth-err" class="auth-err" style="margin-top:1rem;font-weight:600;color:#dc3545;">Invalid email or password</div>
+    <div id="auth-err" class="auth-err" style="display:none; margin-top:1rem;font-weight:600;color:#dc3545;">Invalid email or password</div>
     
     <div class="auth-hints" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
       <div style="font-size:.75rem;color:var(--text3);margin-bottom:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Demo Access</div>
@@ -493,7 +494,10 @@ nav{
             <div style="font-size:1.6rem;font-weight:800;color:var(--text);">Inventory</div>
             <div style="font-size:.85rem;color:var(--text3);font-weight:500;" id="stk-count-lbl">0 items in stock</div>
           </div>
-          <button class="btn btn-accent btn-sm" onclick="openStockModal()">+ New Product</button>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-ghost btn-sm" onclick="openRestockModal()">Restock</button>
+            <button class="btn btn-accent btn-sm" onclick="openStockModal()">+ New Product</button>
+          </div>
         </div>
       </div>
 
@@ -846,7 +850,7 @@ window.addEventListener('DOMContentLoaded', checkSession);
 
 function logout(){
   if(confirm('Are you sure you want to log out?')){
-    sessionStorage.removeItem('rp_user');
+    sessionStorage.clear();
     location.reload();
   }
 }
@@ -1256,7 +1260,7 @@ function renderStock(){
           ${isOut?'<span class="badge badge-red">Out</span>':isLow?'<span class="badge badge-orange" style="background:rgba(253,126,20,0.1);color:#fd7e14;">Low</span>':'<span class="badge badge-green">OK</span>'}
           ${margin?`<span class="badge badge-blue">${margin}% margin</span>`:''}
         </div>
-        ${isAdmin?`<div style="display:flex;gap:.5rem;"><button class="btn btn-ghost btn-xs" onclick="openStockModal('${p.id}')">Edit</button><button class="btn btn-red btn-ghost btn-xs" onclick="deleteProduct('${p.id}')">Del</button></div>`:''}
+        ${isAdmin?`<div style="display:flex;gap:.4rem;"><button class="btn btn-gold btn-xs" onclick="openRestockModal('${p.id}')">Restock</button><button class="btn btn-ghost btn-xs" onclick="openStockModal('${p.id}')">Edit</button><button class="btn btn-red btn-ghost btn-xs" onclick="deleteProduct('${p.id}')">Del</button></div>`:''}
       </div>
     </div>`;
   }).join(''):'<div class="empty-state">No products found</div>';
@@ -1277,6 +1281,16 @@ function doRestock(){
   if(document.getElementById('rs-cost').value)p.cost=newCost;
   S.restocks.push({id:uid(),date:new Date().toISOString(),productId:pid,productName:p.name,qty,cost:newCost,total:qty*newCost,supplier:document.getElementById('rs-supplier').value,invoice:inv});
   save();closeOv('restock');renderStock();renderDash();toast('Stock updated: +'+qty);
+}
+
+function openRestockModal(id){
+  populateSelects();
+  if(id) document.getElementById('rs-prod').value=id;
+  else document.getElementById('rs-prod').value='';
+  document.getElementById('rs-qty').value='';
+  document.getElementById('rs-cost').value='';
+  document.getElementById('rs-inv').value='INV-'+Math.random().toString(36).slice(2,8).toUpperCase();
+  openOv('restock');
 }
 
 // ══════════════════════════════════════════════════
@@ -1453,7 +1467,10 @@ function renderReports(){
         </div>
         <div class="flex-between fs-xs text-dim">
           <div>${s.receipt} • ${dateStr(s.date)}</div>
-          <div class="badge badge-accent">${s.method}</div>
+          <div style="display:flex;gap:.5rem;align-items:center;">
+            <div class="badge badge-accent">${s.method}</div>
+            ${currentUser && currentUser.role === 'admin' ? `<button class="btn btn-red btn-ghost btn-xs" style="padding:.2rem .5rem;" onclick="event.stopPropagation(); deleteSale('${s.id}')">Delete</button>` : ''}
+          </div>
         </div>
       </div>`).join(''):'<div class="empty-state">No sales found</div>';
   }
@@ -1481,6 +1498,12 @@ function viewReceipt(id){
     <div style="text-align:center;margin-top:1.5rem;font-size:.75rem;color:#777;font-style:italic;">${S.settings.footer}</div>
   `;
   document.getElementById('ov-receipt').classList.add('active');
+}
+
+function deleteSale(id){
+  if(!confirm('Delete this transaction? (Stock will NOT be restored)'))return;
+  S.sales=S.sales.filter(s=>s.id!==id);
+  save();renderReports();renderDash();updateNavBadge();toast('Transaction deleted');
 }
 
 // ══════════════════════════════════════════════════
@@ -1586,8 +1609,21 @@ function renderRestockHistory(){
   document.getElementById('adm-reorders').textContent=sorted.length;
   document.getElementById('adm-history-list').innerHTML=sorted.length?sorted.map(r=>`
     <div class="card card-sm" style="margin-bottom:.65rem;">
-      <div class="flex-between"><div><div class="li-main">${r.productName}</div><div class="li-sub">${dateStr(r.date)} · ${r.invoice||''}${r.supplier?' · '+r.supplier:''}</div></div><div style="text-align:right;"><div class="text-accent fw-600">${fmt(r.total)}</div><div class="li-sub">+${r.qty} units @ ${fmt(r.cost)}</div></div></div>
+      <div class="flex-between">
+        <div><div class="li-main">${r.productName}</div><div class="li-sub">${dateStr(r.date)} · ${r.invoice||''}${r.supplier?' · '+r.supplier:''}</div></div>
+        <div style="text-align:right;">
+          <div class="text-accent fw-600">${fmt(r.total)}</div>
+          <div class="li-sub" style="margin-bottom:.4rem;">+${r.qty} units @ ${fmt(r.cost)}</div>
+          <button class="btn btn-red btn-ghost btn-xs" onclick="deleteRestock('${r.id}')">Delete</button>
+        </div>
+      </div>
     </div>`).join(''):'<div class="empty-state">No restock history</div>';
+}
+
+function deleteRestock(id){
+  if(!confirm('Delete this restock record? (Stock will NOT be reduced)'))return;
+  S.restocks=S.restocks.filter(r=>r.id!==id);
+  save();renderRestockHistory();renderDash();toast('Restock record deleted');
 }
 
 async function factoryReset(){
@@ -1596,7 +1632,9 @@ async function factoryReset(){
   if(c==='DELETE'){
     if(db){
       try {
+        isCloudReady = false; // CRITICAL: Stop the onSnapshot from re-saving local state
         await db.collection('appData').doc('main').delete();
+        S = JSON.parse(JSON.stringify(DEFAULTS)); // Clear local memory
         console.log("Cloud wiped.");
         location.reload();
       } catch(e){
