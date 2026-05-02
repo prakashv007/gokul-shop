@@ -2030,7 +2030,7 @@
         <span id="nav-pnd-badge" class="nav-badge" style="display:none;">0</span>
         <span>Pending</span>
       </button>
-      <button class="nav-item" onclick="navTo('reports')">
+      <button class="nav-item" id="nav-reports-btn" onclick="navTo('reports')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
@@ -2181,6 +2181,12 @@
       updateNavBadge();
       if (currentUser) {
         document.getElementById('hdr-avatar').textContent = currentUser.name.slice(0, 2).toUpperCase();
+        
+        // Hide reports tab for non-admins
+        const reportsNavBtn = document.getElementById('nav-reports-btn');
+        if (reportsNavBtn) {
+           reportsNavBtn.style.display = (currentUser.role === 'admin') ? 'flex' : 'none';
+        }
       }
     }
 
@@ -2293,7 +2299,13 @@
       if (id === 'pos') { populateSelects(); renderPOS(); }
       if (id === 'stock') { populateSelects(); renderStock(); }
       if (id === 'pending') renderPending();
-      if (id === 'reports') renderReports();
+      if (id === 'reports') {
+        if (!currentUser || currentUser.role !== 'admin') {
+          toast('Access denied: Admin only', 'err');
+          return;
+        }
+        renderReports();
+      }
       if (id === 'admin') { renderAdmin(); }
       // close cart if navigating away
       document.getElementById('cart-sheet').classList.remove('open');
