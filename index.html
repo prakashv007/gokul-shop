@@ -199,6 +199,14 @@ nav{
 .bill-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:.75rem;opacity:.6;}
 .kbd-hint{font-size:.65rem;color:var(--text3);text-align:center;margin-top:.4rem;}
 .kbd{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.65rem;font-weight:700;}
+/* Mobile: stack POS vertically */
+@media(max-width:700px){
+  #pg-pos{flex-direction:column;height:auto;min-height:calc(100vh - var(--hdr) - var(--nav) - 2.4rem);overflow-y:auto;}
+  .pos-left{border-right:none;border-bottom:1px solid var(--border);max-height:55vh;}
+  .pos-right{width:100%;}
+  .bqb.del-btn{opacity:1!important;display:flex!important;}
+  .bill-row{flex-wrap:wrap;gap:.4rem;}
+}
 
 /* ── CART SHEET ── */
 #cart-sheet{
@@ -1145,9 +1153,16 @@ function posSearchKey(e){
   }else if(e.key==='Escape'){ac.style.display='none';document.getElementById('pos-search').value='';renderPOS();}
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.pos-search-wrap')){const ac=document.getElementById('pos-ac');if(ac)ac.style.display='none';}});
+
+// Guard: don't fire shortcuts when user is typing in bill inputs
+function isTypingInInput(){
+  const el=document.activeElement;
+  return el&&(el.tagName==='INPUT'||el.tagName==='SELECT'||el.tagName==='TEXTAREA')&&el.id!=='pos-search';
+}
 document.addEventListener('keydown',e=>{
+  if(isTypingInInput())return; // Don't intercept when typing in forms
   if(e.ctrlKey&&e.key==='b'){e.preventDefault();completeSale();}
-  if(e.ctrlKey&&e.key==='n'){e.preventDefault();clearCart();const s=document.getElementById('pos-search');if(s)s.focus();}
+  if(e.ctrlKey&&e.key==='n'){e.preventDefault();clearCart();const s=document.getElementById('pos-search');if(s){s.focus();s.select();}}
   if(e.ctrlKey&&e.key==='p'){e.preventDefault();printReceipt();}
 });
 
