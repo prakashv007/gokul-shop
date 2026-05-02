@@ -1431,8 +1431,8 @@ function renderReports(){
   const profit=rev-cogs;
   const margin=rev?Math.round(profit/rev*100):0;
   
-  const totalInvest=S.restocks.reduce((a,r)=>a+r.total,0);
   const stockVal=S.products.reduce((a,p)=>a+(p.cost*p.qty),0);
+  const totalInvest=stockVal + cogs; // Investment = Current Stock + Items already sold
   const stockQty=S.products.reduce((a,p)=>a+p.qty,0);
   const potentialProfit=S.products.reduce((a,p)=>a+(p.price-p.cost)*p.qty,0);
 
