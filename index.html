@@ -562,27 +562,53 @@ nav{
         <div class="stat-card">
           <div class="stat-lbl">Revenue</div>
           <div class="stat-val" id="rp-rev">₹0</div>
+          <div class="stat-sub" id="rp-rev-sub">0 sales</div>
         </div>
         <div class="stat-card">
-          <div class="stat-lbl">Net Profit</div>
+          <div class="stat-lbl">Profit</div>
           <div class="stat-val" id="rp-profit" style="color:#28a745;">₹0</div>
+          <div class="stat-sub" id="rp-margin">0% margin</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Investment</div>
+          <div class="stat-val" id="rp-invest" style="color:var(--accent-s);">₹0</div>
+          <div class="stat-sub">Total purchases</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Stock Value</div>
+          <div class="stat-val" id="rp-stock-val" style="color:#fd7e14;">₹0</div>
+          <div class="stat-sub">At cost price</div>
         </div>
       </div>
 
       <div class="tabs">
         <div class="tab active" onclick="rptTab('overview',this)">Overview</div>
         <div class="tab" onclick="rptTab('products',this)">Products</div>
+        <div class="tab" onclick="rptTab('purchases',this)">Purchases</div>
         <div class="tab" onclick="rptTab('monthly',this)">Monthly</div>
         <div class="tab" onclick="rptTab('history',this)">History</div>
       </div>
 
       <div id="rpt-overview">
+        <div class="card card-sm" style="background:var(--s3);border:1px solid var(--accent-d);margin-bottom:1.5rem;">
+          <div class="flex-between">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);">Potential Profit</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--accent-s);" id="rp-potential">₹0</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);">In-Stock Qty</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--text);" id="rp-stock-qty">0</div>
+            </div>
+          </div>
+        </div>
         <div class="card-title">Payment Methods</div>
         <div id="rp-methods"></div>
         <div class="card-title" style="margin-top:1.5rem;">Category Sales</div>
         <div id="rp-cats"></div>
       </div>
       <div id="rpt-products" style="display:none;"><div id="rp-prods-list"></div></div>
+      <div id="rpt-purchases" style="display:none;"><div id="rp-purchases-list"></div></div>
       <div id="rpt-monthly" style="display:none;"><div id="rp-monthly-list"></div></div>
       <div id="rpt-history" style="display:none;">
         <div class="search-wrap">
@@ -1395,7 +1421,7 @@ function rptTab(sec,el){
   rptSection=sec;
   document.querySelectorAll('#pg-reports .tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['overview','products','monthly','history'].forEach(s=>document.getElementById('rpt-'+s).style.display=s===sec?'block':'none');
+  ['overview','products','purchases','monthly','history'].forEach(s=>document.getElementById('rpt-'+s).style.display=s===sec?'block':'none');
   renderReports();
 }
 
@@ -1404,10 +1430,20 @@ function renderReports(){
   const cogs=S.sales.reduce((a,s)=>a+s.items.reduce((b,i)=>b+(i.cost||0)*i.qty,0),0);
   const profit=rev-cogs;
   const margin=rev?Math.round(profit/rev*100):0;
+  
+  const totalInvest=S.restocks.reduce((a,r)=>a+r.total,0);
+  const stockVal=S.products.reduce((a,p)=>a+(p.cost*p.qty),0);
+  const stockQty=S.products.reduce((a,p)=>a+p.qty,0);
+  const potentialProfit=S.products.reduce((a,p)=>a+(p.price-p.cost)*p.qty,0);
+
   document.getElementById('rp-rev').textContent=fmt(rev);
+  document.getElementById('rp-rev-sub').textContent=S.sales.length+' transactions';
   document.getElementById('rp-profit').textContent=fmt(profit);
-  document.getElementById('rp-cogs').textContent=fmt(cogs);
-  document.getElementById('rp-margin').textContent=margin+'%';
+  document.getElementById('rp-margin').textContent=margin+'% margin';
+  document.getElementById('rp-invest').textContent=fmt(totalInvest);
+  document.getElementById('rp-stock-val').textContent=fmt(stockVal);
+  document.getElementById('rp-stock-qty').textContent=stockQty;
+  document.getElementById('rp-potential').textContent=fmt(potentialProfit);
 
   if(rptSection==='overview'){
     // Payment method breakdown
@@ -1441,6 +1477,15 @@ function renderReports(){
       const pr=p.rev-p.cogs;const mg=p.rev?Math.round(pr/p.rev*100):0;
       return `<div class="list-item"><div><div class="li-main">${p.name}</div><div class="li-sub">${p.units} units · Profit: ${fmt(pr)} (${mg}%)</div></div><div class="text-accent fw-600">${fmt(p.rev)}</div></div>`;
     }).join('')||'<div class="empty-state">No data</div>';
+  } else if(rptSection==='purchases'){
+    const sorted=[...S.restocks].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    document.getElementById('rp-purchases-list').innerHTML=sorted.length?sorted.map(r=>`
+      <div class="card card-sm" style="margin-bottom:.65rem;">
+        <div class="flex-between">
+          <div><div class="li-main">${r.productName}</div><div class="li-sub">${dateStr(r.date)} · ${r.supplier||'Direct'}</div></div>
+          <div style="text-align:right;"><div class="text-accent fw-600">${fmt(r.total)}</div><div class="li-sub">+${r.qty} units</div></div>
+        </div>
+      </div>`).join(''):'<div class="empty-state">No purchase history</div>';
   } else if(rptSection==='monthly'){
     // Monthly
     const mo={};
