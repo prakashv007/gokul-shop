@@ -1687,15 +1687,17 @@ function deleteRestock(id){
 }
 
 async function factoryReset(){
-  if(!confirm('WIPE ENTIRE DATABASE? All data on all devices will be deleted.'))return;
+  if(!confirm('WIPE DATA? This will delete all Products, Sales, and Restocks, but keep your Categories and Settings.'))return;
   const c=prompt("Type DELETE to confirm:");
   if(c==='DELETE'){
     if(db){
       try {
-        isCloudReady = false; // CRITICAL: Stop the onSnapshot from re-saving local state
-        await db.collection('appData').doc('main').delete();
-        S = JSON.parse(JSON.stringify(DEFAULTS)); // Clear local memory
-        console.log("Cloud wiped.");
+        S.products = [];
+        S.sales = [];
+        S.restocks = [];
+        // Keep categories, brands, suppliers, sizes, colors, settings, and users
+        await save();
+        console.log("Data wiped, settings preserved.");
         location.reload();
       } catch(e){
         console.error("Wipe failed", e);
