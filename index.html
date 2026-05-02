@@ -2887,10 +2887,10 @@
       const cogs = sales.reduce((a, s) => a + s.items.reduce((b, i) => b + (i.cost || 0) * i.qty, 0), 0);
       const profit = rev - cogs;
       const margin = rev ? Math.round(profit / rev * 100) : 0;
-      const stockVal = S.products.reduce((a, p) => a + (p.cost * p.qty), 0);
+      const stockVal = S.products.reduce((a, p) => a + (p.qty > 0 ? (p.cost * p.qty) : 0), 0);
       const totalInvest = stockVal + cogs;
-      const stockQty = S.products.reduce((a, p) => a + p.qty, 0);
-      const potentialProfit = S.products.reduce((a, p) => a + (p.price - p.cost) * p.qty, 0);
+      const stockQty = S.products.reduce((a, p) => a + (p.qty > 0 ? p.qty : 0), 0);
+      const potentialProfit = S.products.reduce((a, p) => a + (p.qty > 0 ? (p.price - p.cost) * p.qty : 0), 0);
 
       document.getElementById('rp-rev').textContent = fmt(rev);
       document.getElementById('rp-rev-sub').textContent = sales.length + ' transactions · ' + periodLabel;
