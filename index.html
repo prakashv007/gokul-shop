@@ -346,10 +346,10 @@ nav{
   <div class="modal center">
     <div class="modal-hdr"><div class="modal-title">Restock Product</div><button class="modal-close" onclick="closeOv('restock')">×</button></div>
     <div class="modal-body">
-      <div class="inp-row"><label class="inp-lbl">Product</label><select class="inp" id="rs-prod"></select></div>
+      <div class="inp-row"><label class="inp-lbl">Product</label><select class="inp" id="rs-prod" onchange="onRsProdChange()"></select></div>
       <div class="inp-grid" style="margin-bottom:.85rem;">
         <div><label class="inp-lbl">Quantity to Add</label><input class="inp" id="rs-qty" type="number" placeholder="0"></div>
-        <div><label class="inp-lbl">New Cost/Unit (₹)</label><input class="inp" id="rs-cost" type="number" placeholder="optional"></div>
+        <div><label class="inp-lbl">Purchase Cost/Unit (₹)</label><input class="inp" id="rs-cost" type="number" placeholder="0"></div>
       </div>
       <div class="inp-row"><label class="inp-lbl">Supplier</label><select class="inp" id="rs-supplier"></select></div>
       <div class="inp-row"><label class="inp-lbl">Invoice No.</label><input class="inp" id="rs-inv" placeholder="INV-001"></div>
@@ -1311,12 +1311,27 @@ function doRestock(){
 
 function openRestockModal(id){
   populateSelects();
-  if(id) document.getElementById('rs-prod').value=id;
-  else document.getElementById('rs-prod').value='';
+  if(id) {
+    document.getElementById('rs-prod').value=id;
+    onRsProdChange();
+  } else {
+    document.getElementById('rs-prod').value='';
+    document.getElementById('rs-cost').value='';
+    document.getElementById('rs-cost').placeholder='0';
+  }
   document.getElementById('rs-qty').value='';
-  document.getElementById('rs-cost').value='';
   document.getElementById('rs-inv').value='INV-'+Math.random().toString(36).slice(2,8).toUpperCase();
   openOv('restock');
+}
+
+function onRsProdChange(){
+  const id=document.getElementById('rs-prod').value;
+  const p=S.products.find(x=>x.id===id);
+  if(p){
+    document.getElementById('rs-cost').value=p.cost;
+    document.getElementById('rs-cost').placeholder='Current: '+p.cost;
+    document.getElementById('rs-supplier').value=p.supplier||'';
+  }
 }
 
 // ══════════════════════════════════════════════════
