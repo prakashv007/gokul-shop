@@ -824,7 +824,6 @@ const timeStr=d=>new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'
 async function initApp(){
   setLang(S.lang);
   loadSettings();
-  seedDemo();
   renderDash();
   populateSelects();
   updateNavBadge();
@@ -1692,12 +1691,14 @@ async function factoryReset(){
   if(c==='DELETE'){
     if(db){
       try {
+        isCloudReady = false; // Stop sync engine
         S.products = [];
         S.sales = [];
         S.restocks = [];
-        // Keep categories, brands, suppliers, sizes, colors, settings, and users
-        await save();
+        // Keep Categories, Brands, Suppliers, Settings etc.
+        await db.collection('appData').doc('main').set(S);
         console.log("Data wiped, settings preserved.");
+        sessionStorage.clear();
         location.reload();
       } catch(e){
         console.error("Wipe failed", e);
