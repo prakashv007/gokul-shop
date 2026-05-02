@@ -1503,8 +1503,7 @@
           </div>
         </div>
         <div class="inp-row">
-          <label class="inp-lbl">Discount (%)</label><input class="inp" id="sale-disc" type="number" placeholder="0"
-            min="0" max="100" oninput="updateCartUI()">
+          <label class="inp-lbl">Discount (₹)</label><input class="inp" id="sale-disc" type="number" placeholder="0" min="0" oninput="updateCartUI()">
         </div>
       </div>
       <div id="cart-totals" style="margin-bottom:.75rem;"></div>
@@ -2315,10 +2314,11 @@
     function populateSelects() {
       const f = S.filters;
       const fill = (id, arr, def) => {
-        const el = document.getElementById(id); if (!el) return;
-        const cur = el.value;
-        el.innerHTML = (def ? `<option value="">${def}</option>` : '') + arr.map(v => `<option value="${v}">${v}</option>`).join('');
-        if (cur && arr.includes(cur)) el.value = cur;
+        document.querySelectorAll(`[id='${id}']`).forEach(el => {
+          const cur = el.value;
+          el.innerHTML = (def ? `<option value="">${def}</option>` : '') + arr.map(v => `<option value="${v}">${v}</option>`).join('');
+          if (cur && arr.includes(cur)) el.value = cur;
+        });
       };
       fill('sm-cat', f.categories, 'Select...');
       fill('sm-subcat', f.subcategories, 'Select...');
@@ -2507,14 +2507,14 @@
       <div class="bill-line-total">${fmt(c.price * c.qty)}</div>
     </div>`).join('');
       const sub = cart.reduce((a, c) => a + c.price * c.qty, 0);
-      const discAmt = parseFloat(document.getElementById('sale-disc').value) || 0;
+      let discAmt = 0;
+      document.querySelectorAll(`[id='sale-disc']`).forEach(el => { if(el.value) discAmt = parseFloat(el.value); });
       const total = sub - discAmt;
       if (billTotals) billTotals.innerHTML = `
     <div class="bill-tot-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
     ${discAmt ? `<div class="bill-tot-row"><span>Discount</span><span style="color:#dc3545;">-${fmt(discAmt)}</span></div>` : ''}
     <div class="bill-grand"><span>TOTAL</span><span>${fmt(total)}</span></div>`;
-      const paidEl = document.getElementById('sale-paid');
-      if (paidEl) paidEl.placeholder = 'Amount paid (₹' + total.toLocaleString('en-IN') + ')';
+      document.querySelectorAll(`[id='sale-paid']`).forEach(el => el.placeholder = 'Amount paid (₹' + total.toLocaleString('en-IN') + ')');
       // Legacy cart-items for receipt
       const ci = document.getElementById('cart-items');
       if (ci) ci.innerHTML = '';
@@ -2535,11 +2535,19 @@
     function completeSale() {
       if (!cart.length) { toast('Bill is empty', 'err'); return; }
       const sub = cart.reduce((a, c) => a + c.price * c.qty, 0);
-      const discAmt = parseFloat(document.getElementById('sale-disc').value) || 0;
+      
+      const getVal = (id) => {
+        let val = '';
+        document.querySelectorAll(`[id='${id}']`).forEach(el => { if (el.value) val = el.value; });
+        return val;
+      };
+
+      const discAmt = parseFloat(getVal('sale-disc')) || 0;
       const total = sub - discAmt;
-      const paid = parseFloat(document.getElementById('sale-paid').value) || total;
-      const customer = document.getElementById('sale-cust').value.trim() || 'Guest';
-      const method = document.getElementById('sale-method').value || 'Cash';
+      const paidVal = getVal('sale-paid');
+      const paid = paidVal ? parseFloat(paidVal) : total;
+      const customer = getVal('sale-cust').trim() || 'Guest';
+      const method = getVal('sale-method') || 'Cash';
       if (paid < total && customer === 'Guest') { toast('Enter customer name for credit sale', 'err'); return; }
       const sale = {
         id: uid(), receipt: 'RCP-' + String(1000 + S.sales.length + 1).padStart(4, '0'),
@@ -2552,7 +2560,9 @@
       const savedCart = [...cart];
       save();
       cart = [];
-      ['sale-cust', 'sale-phone', 'sale-paid', 'sale-disc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      ['sale-cust', 'sale-phone', 'sale-paid', 'sale-disc'].forEach(id => {
+        document.querySelectorAll(`[id='${id}']`).forEach(el => el.value = '');
+      });
       updateCartUI();
       renderPOS();
       renderDash();
