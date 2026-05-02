@@ -1568,6 +1568,32 @@ function doPayBalance(){
 //  REPORTS
 // ══════════════════════════════════════════════════
 let rptSection='overview';
+let rptPeriod='all';
+
+function setRptPeriod(p,el){
+  rptPeriod=p;
+  document.querySelectorAll('.period-pill').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderReports();
+}
+
+function getSalesForPeriod(){
+  const now=new Date();
+  return S.sales.filter(s=>{
+    const d=new Date(s.date);
+    if(rptPeriod==='today'){
+      return d.toDateString()===now.toDateString();
+    } else if(rptPeriod==='week'){
+      const start=new Date(now);start.setDate(now.getDate()-now.getDay());
+      start.setHours(0,0,0,0);
+      return d>=start;
+    } else if(rptPeriod==='month'){
+      return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    }
+    return true; // 'all'
+  });
+}
+
 function rptTab(sec,el){
   rptSection=sec;
   document.querySelectorAll('#pg-reports .tab').forEach(t=>t.classList.remove('active'));
@@ -1577,18 +1603,19 @@ function rptTab(sec,el){
 }
 
 function renderReports(){
-  const rev=S.sales.reduce((a,s)=>a+s.total,0);
-  const cogs=S.sales.reduce((a,s)=>a+s.items.reduce((b,i)=>b+(i.cost||0)*i.qty,0),0);
+  const sales=getSalesForPeriod();
+  const periodLabel=rptPeriod==='today'?'Today':rptPeriod==='week'?'This Week':rptPeriod==='month'?'This Month':'All Time';
+  const rev=sales.reduce((a,s)=>a+s.total,0);
+  const cogs=sales.reduce((a,s)=>a+s.items.reduce((b,i)=>b+(i.cost||0)*i.qty,0),0);
   const profit=rev-cogs;
   const margin=rev?Math.round(profit/rev*100):0;
-  
   const stockVal=S.products.reduce((a,p)=>a+(p.cost*p.qty),0);
-  const totalInvest=stockVal + cogs; // Investment = Current Stock + Items already sold
+  const totalInvest=stockVal+cogs;
   const stockQty=S.products.reduce((a,p)=>a+p.qty,0);
   const potentialProfit=S.products.reduce((a,p)=>a+(p.price-p.cost)*p.qty,0);
 
   document.getElementById('rp-rev').textContent=fmt(rev);
-  document.getElementById('rp-rev-sub').textContent=S.sales.length+' transactions';
+  document.getElementById('rp-rev-sub').textContent=sales.length+' transactions · '+periodLabel;
   document.getElementById('rp-profit').textContent=fmt(profit);
   document.getElementById('rp-margin').textContent=margin+'% margin';
   document.getElementById('rp-invest').textContent=fmt(totalInvest);
@@ -1597,30 +1624,22 @@ function renderReports(){
   document.getElementById('rp-potential').textContent=fmt(potentialProfit);
 
   if(rptSection==='overview'){
-    // Payment method breakdown
-    const pm={};S.sales.forEach(s=>{pm[s.method||'Cash']=(pm[s.method||'Cash']||0)+s.total;});
+    const pm={};sales.forEach(s=>{pm[s.method||'Cash']=(pm[s.method||'Cash']||0)+s.total;});
     const pmTotal=Object.values(pm).reduce((a,v)=>a+v,0)||1;
     document.getElementById('rp-methods').innerHTML=Object.entries(pm).sort((a,b)=>b[1]-a[1]).map(([m,v])=>`
       <div style="margin-bottom:1rem;">
         <div class="flex-between" style="font-size:.85rem;margin-bottom:.5rem;font-weight:600;"><span>${m}</span><span class="text-accent fw-800">${fmt(v)}</span></div>
         <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/pmTotal*100)}%;background:var(--accent);"></div></div>
-      </div>`).join('')||'<div class="empty-state">No data</div>';
-
-    // Category breakdown
-    const cb={};
-    S.sales.forEach(s=>s.items.forEach(i=>{
-      cb[i.category]=(cb[i.category]||0)+i.price*i.qty;
-    }));
+      </div>`).join('')||'<div class="empty-state">No data for '+periodLabel+'</div>';
+    const cb={};sales.forEach(s=>s.items.forEach(i=>{cb[i.category]=(cb[i.category]||0)+i.price*i.qty;}));
     const cbTotal=Object.values(cb).reduce((a,v)=>a+v,0)||1;
     document.getElementById('rp-cats').innerHTML=Object.entries(cb).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`
       <div style="margin-bottom:1rem;">
         <div class="flex-between" style="font-size:.85rem;margin-bottom:.5rem;font-weight:600;"><span>${c}</span><span class="text-accent fw-800">${fmt(v)}</span></div>
         <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/cbTotal*100)}%;background:var(--accent);"></div></div>
-      </div>`).join('')||'<div class="empty-state">No data</div>';
+      </div>`).join('')||'<div class="empty-state">No data for '+periodLabel+'</div>';
   } else if(rptSection==='products'){
-    // Products
-    const pp={};
-    S.sales.forEach(s=>s.items.forEach(i=>{
+    const pp={};sales.forEach(s=>s.items.forEach(i=>{
       if(!pp[i.name])pp[i.name]={name:i.name,units:0,rev:0,cogs:0};
       pp[i.name].units+=i.qty;pp[i.name].rev+=i.price*i.qty;pp[i.name].cogs+=(i.cost||0)*i.qty;
     }));
@@ -1638,34 +1657,28 @@ function renderReports(){
         </div>
       </div>`).join(''):'<div class="empty-state">No purchase history</div>';
   } else if(rptSection==='monthly'){
-    // Monthly
     const mo={};
-    S.sales.forEach(s=>{
+    sales.forEach(s=>{
       const m=new Date(s.date).toLocaleDateString('en-IN',{month:'short',year:'numeric'});
       if(!mo[m])mo[m]={rev:0,profit:0,txns:0};
       mo[m].rev+=s.total;mo[m].profit+=s.total-s.items.reduce((a,i)=>a+(i.cost||0)*i.qty,0);mo[m].txns++;
     });
-    document.getElementById('rp-monthly-list').innerHTML=Object.entries(mo).map(([m,d])=>`
+    document.getElementById('rp-monthly-list').innerHTML=Object.entries(mo).reverse().map(([m,d])=>`
       <div class="list-item"><div><div class="li-main">${m}</div><div class="li-sub">${d.txns} transactions</div></div><div style="text-align:right;"><div class="text-accent fw-600">${fmt(d.rev)}</div><div style="font-size:.72rem;color:var(--green);">+${fmt(d.profit)} profit</div></div></div>`).join('')||'<div class="empty-state">No data</div>';
   } else if(rptSection==='history'){
-    // Sales History (Searchable)
     const query=(document.getElementById('rpt-sale-search').value||'').toLowerCase();
-    const filteredSales=S.sales.filter(s=>
-      s.customer.toLowerCase().includes(query) ||
+    const filteredSales=sales.filter(s=>
+      s.customer.toLowerCase().includes(query)||
       s.receipt.toLowerCase().includes(query)
     ).reverse();
-
     document.getElementById('rp-sales-list').innerHTML=filteredSales.length?filteredSales.map(s=>`
       <div class="card card-sm mb-xs" onclick="viewReceipt('${s.id}')" style="cursor:pointer;margin-bottom:.5rem;">
-        <div class="flex-between mb-xs">
-          <div class="fw-600 fs-sm">${s.customer || 'Guest'}</div>
-          <div class="fw-700">${fmt(s.total)}</div>
-        </div>
+        <div class="flex-between mb-xs"><div class="fw-600 fs-sm">${s.customer||'Guest'}</div><div class="fw-700">${fmt(s.total)}</div></div>
         <div class="flex-between fs-xs text-dim">
           <div>${s.receipt} • ${dateStr(s.date)}</div>
           <div style="display:flex;gap:.5rem;align-items:center;">
             <div class="badge badge-accent">${s.method}</div>
-            ${currentUser && currentUser.role === 'admin' ? `<button class="btn btn-red btn-ghost btn-xs" style="padding:.2rem .5rem;" onclick="event.stopPropagation(); deleteSale('${s.id}')">Delete</button>` : ''}
+            ${currentUser&&currentUser.role==='admin'?`<button class="btn btn-red btn-ghost btn-xs" style="padding:.2rem .5rem;" onclick="event.stopPropagation();deleteSale('${s.id}')">Delete</button>`:''}
           </div>
         </div>
       </div>`).join(''):'<div class="empty-state">No sales found</div>';
@@ -1854,20 +1867,7 @@ async function factoryReset(){
   }
 }
 
-// ══ KEYBOARD SHORTCUTS ══
-document.addEventListener('keydown', e => {
-  // Only when POS is active
-  const posActive = document.getElementById('pg-pos').classList.contains('active');
-  if(e.ctrlKey && e.key === 'b'){e.preventDefault(); completeSale(); return;}
-  if(e.ctrlKey && e.key === 'n'){e.preventDefault(); clearCart(); toast('New Bill'); return;}
-  if(posActive){
-    // Focus search on any letter key (not modifier)
-    if(!e.ctrlKey && !e.altKey && e.key.length===1){
-      const s=document.getElementById('pos-search');
-      if(document.activeElement!==s){s.focus();}
-    }
-  }
-});
+// ══ LEGACY SHORTCUTS REMOVED ══
 
 // ══════════════════════════════════════════════════
 //  OVERLAY HELPERS
